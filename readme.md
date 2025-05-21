@@ -14,3 +14,16 @@
 4. As informações apresentadas devem ser processadas pelo Dashboard, evitando a exibição de saídas de texto "cruas" ou "raw" retornadas por serviços, funções, APIs ou comandos do sistema operacional.
 5. As informações não devem ser obtidas através de comandos do shell (ex.: `ls`, `ps`, `du`, etc.). Devem ser utilizadas chamadas de sistema ou outros meios fornecidos pelo sistema operacional (ex.: diretórios no Linux, tabela de partições do disco, etc.).
 6. A linguagem de implementação do Dashboard é livre, mas a obtenção das informações dos processos deve ser feita via API do sistema operacional.
+
+
+
+# CLASSES -
+1 - Classe responsavel por chamadas das funcoes de sistemas
+   - Metodos:
+      - Quantidade de processos rodando;
+      - Qunatidade de processos de cada aplicacao
+      - Tempo ocioso do processador
+      - Quantidade de treads de cada processo
+      - Tempo de uso;
+      - Lista de processos existentes, juntamente com os respectivos usuarios
+      - informacoes sobre as treads de cada processo
