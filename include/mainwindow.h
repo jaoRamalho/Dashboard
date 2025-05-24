@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "include/ProcessInfo.h"
+#include <vector>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,7 +20,12 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void onProcessListUpdated(const std::vector<ProcessInfo>&);
+    void onSearchTextChanged();
+
 private:
     Ui::MainWindow *ui;
+    std::vector<ProcessInfo> allProcesses;
 };
 #endif // MAINWINDOW_H

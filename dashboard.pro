@@ -11,11 +11,18 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     src/SystemCall.cpp \
-    src/mainwindow.cpp
+    src/mainwindow.cpp \
+    src/ThreadManager.cpp \
+    src/MyObject.cpp \
+    src/DataProvider.cpp \ 
 
 HEADERS += \
-    include/SystemCall.h \
-    include/mainwindow.h
+    include/SystemCall.hpp \
+    include/mainwindow.h \ 
+    include/ThreadManager.hpp \
+    include/MyObject.hpp \
+    include/DataProvider.hpp \
+    include/ProcessInfo.h
 
 FORMS += \
     mainwindow.ui
