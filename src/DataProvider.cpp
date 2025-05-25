@@ -38,32 +38,34 @@ void DataProvider::loop() {
         std::vector<CPUInfo*> cpuList;
         std::vector<MemoryInfo*> memoryList;
 
-        for (auto& base : sysCallProcesses->getInfo()) {
-            ProcessInfo* p = dynamic_cast<ProcessInfo*>(base);
-            if (p) processList.push_back(p);
+        if(sysCallProcesses->isAccessible()) {
+            for (auto& base : sysCallProcesses->getInfo()) {
+                ProcessInfo* p = dynamic_cast<ProcessInfo*>(base);
+                if (p) processList.push_back(p);
+            }
+            if (processList.size() > 0)
+                emit processListUpdated(processList);
         }
     
 
-        for (auto& base : sysCallMemory->getInfo()) {
-            MemoryInfo* m = dynamic_cast<MemoryInfo*>(base);
-            if (m) memoryList.push_back(m);
+        if (sysCallMemory->isAccessible()){
+            for (auto& base : sysCallMemory->getInfo()) {
+                MemoryInfo* m = dynamic_cast<MemoryInfo*>(base);
+                if (m) memoryList.push_back(m);
+            }
+            if (memoryList.size() > 0)
+                emit memoryListUpdated(memoryList);
         }
 
-        for (auto& base : sysCallCPU->getInfo()) {
-            CPUInfo* c = dynamic_cast<CPUInfo*>(base);
-            if (c) cpuList.push_back(c);
+        if (sysCallCPU->isAccessible()){
+            for (auto& base : sysCallCPU->getInfo()) {
+                CPUInfo* c = dynamic_cast<CPUInfo*>(base);
+                if (c) cpuList.push_back(c);
+            }
+            if (memoryList.size() > 0)
+                emit cpuListUpdated(cpuList);
         }
-
-        if (processList.size() > 0)
-            emit processListUpdated(processList);
-        
-        if (memoryList.size() > 0)
-            emit cpuListUpdated(cpuList);
-        
-        if (memoryList.size() > 0)
-            emit memoryListUpdated(memoryList);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-        if(delay != DEFAULT_DELAY) { delay = DEFAULT_DELAY; }
     }
 }

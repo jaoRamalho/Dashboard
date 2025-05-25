@@ -33,6 +33,15 @@ std::vector<std::string> getThreadIDs(const std::string& pid) {
 }
 
 void SystemCallProcesses::updateProcesses() {
+    std::lock_guard<std::mutex> lock(mtx);
+    for (int i = 0; i < (int)info.size(); i++) {
+        ProcessInfo* p = dynamic_cast<ProcessInfo*>(info[i]);
+        if (p) {
+            delete p;
+            info[i] = nullptr;
+        }
+    }
+
     this->info.clear();
     namespace fs = std::filesystem;
     for (const auto& entry : fs::directory_iterator("/proc")) {
@@ -163,6 +172,5 @@ void SystemCallProcesses::loop() {
         std::cout << "---------------------------------------------------" << std::endl;
         
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-        if (delay != DEFAULT_DELAY) { delay = DEFAULT_DELAY; }
     }
 }

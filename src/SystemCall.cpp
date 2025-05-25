@@ -19,6 +19,7 @@ SystemCall::~SystemCall(){
 
 std::vector<InfoBase*> SystemCall::getInfo()
 {
+    std::lock_guard<std::mutex> lock(mtx);
     if(info.size() > 0){
         return info;
     }

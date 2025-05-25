@@ -21,6 +21,15 @@ SystemCallCPU* SystemCallCPU::getInstance(QObject* parent) {
     return instance;
 }
 void SystemCallCPU::updateCPU() {
+    std::lock_guard<std::mutex> lock(mtx);
+    for (int i = 0; i < (int)info.size(); i++) {
+        CPUInfo* c = dynamic_cast<CPUInfo*>(info[i]);
+        if (c) {
+            delete c;
+            info[i] = nullptr;
+        }
+    }
+
     this->info.clear();
     std::ifstream cpuFile("/proc/cpuinfo");
     if (cpuFile.is_open()) {
@@ -99,6 +108,5 @@ void SystemCallCPU::loop() {
         std::cout << "---------------------------------------------------" << std::endl;
 
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-        if (delay != DEFAULT_DELAY) { delay = DEFAULT_DELAY; }
     }
 }

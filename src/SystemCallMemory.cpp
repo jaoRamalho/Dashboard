@@ -22,6 +22,15 @@ SystemCallMemory* SystemCallMemory::getInstance(QObject* parent) {
 }
 
 void SystemCallMemory::updateMemory() {
+    std::lock_guard<std::mutex> lock(mtx);
+    for (int i = 0; i < (int)info.size(); i++) {
+        MemoryInfo* m = dynamic_cast<MemoryInfo*>(info[i]);
+        if (m) {
+            delete m;
+            info[i] = nullptr;
+        }
+    }
+
     this->info.clear();
     MemoryInfo* memInfo = new MemoryInfo();
 
@@ -70,6 +79,5 @@ void SystemCallMemory::loop() {
         std::cout << "---------------------------------------------------" << std::endl;
 
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-        if (delay != DEFAULT_DELAY) { delay = DEFAULT_DELAY; }
     }
 }
