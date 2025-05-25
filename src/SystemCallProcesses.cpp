@@ -6,6 +6,7 @@ SystemCallProcesses* SystemCallProcesses::instance = nullptr;
 SystemCallProcesses::SystemCallProcesses(QObject* parent) : SystemCall(parent) {
     acessible = false;
     nameMyObject = "SystemCallProcesses";
+    delay = 200;
 }
 
 SystemCallProcesses::~SystemCallProcesses() {

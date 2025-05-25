@@ -5,6 +5,7 @@ SystemCallCPU* SystemCallCPU::instance = nullptr;
 SystemCallCPU::SystemCallCPU(QObject* parent) : SystemCall(parent){
     acessible = false;
     nameMyObject = "SystemCallCPU";
+    delay = 200;
 }
 
 SystemCallCPU::~SystemCallCPU() {

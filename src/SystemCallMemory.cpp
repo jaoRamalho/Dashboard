@@ -5,6 +5,7 @@ SystemCallMemory* SystemCallMemory::instance = nullptr;
 SystemCallMemory::SystemCallMemory(QObject* parent) : SystemCall(parent) {
     acessible = false;
     nameMyObject = "SystemCallMemory";
+    delay = 200;
 }
 
 SystemCallMemory::~SystemCallMemory() {
