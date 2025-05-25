@@ -57,24 +57,36 @@ SOURCES       = main.cpp \
 		src/mainwindow.cpp \
 		src/ThreadManager.cpp \
 		src/MyObject.cpp \
-		src/DataProvider.cpp qrc_qmake_qmake_qm_files.cpp \
+		src/DataProvider.cpp \
+		src/SystemCallCPU.cpp \
+		src/SystemCallMemory.cpp \
+		src/SystemCallProcesses.cpp qrc_qmake_qmake_qm_files.cpp \
 		moc_SystemCall.cpp \
 		moc_mainwindow.cpp \
 		moc_ThreadManager.cpp \
 		moc_MyObject.cpp \
-		moc_DataProvider.cpp
+		moc_DataProvider.cpp \
+		moc_SystemCallCPU.cpp \
+		moc_SystemCallMemory.cpp \
+		moc_SystemCallProcesses.cpp
 OBJECTS       = main.o \
 		SystemCall.o \
 		mainwindow.o \
 		ThreadManager.o \
 		MyObject.o \
 		DataProvider.o \
+		SystemCallCPU.o \
+		SystemCallMemory.o \
+		SystemCallProcesses.o \
 		qrc_qmake_qmake_qm_files.o \
 		moc_SystemCall.o \
 		moc_mainwindow.o \
 		moc_ThreadManager.o \
 		moc_MyObject.o \
-		moc_DataProvider.o
+		moc_DataProvider.o \
+		moc_SystemCallCPU.o \
+		moc_SystemCallMemory.o \
+		moc_SystemCallProcesses.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -132,6 +144,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -157,12 +170,18 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		include/ThreadManager.hpp \
 		include/MyObject.hpp \
 		include/DataProvider.hpp \
-		include/ProcessInfo.h main.cpp \
+		include/ProcessInfo.h \
+		include/SystemCallCPU.hpp \
+		include/SystemCallMemory.hpp \
+		include/SystemCallProcesses.hpp main.cpp \
 		src/SystemCall.cpp \
 		src/mainwindow.cpp \
 		src/ThreadManager.cpp \
 		src/MyObject.cpp \
-		src/DataProvider.cpp
+		src/DataProvider.cpp \
+		src/SystemCallCPU.cpp \
+		src/SystemCallMemory.cpp \
+		src/SystemCallProcesses.cpp
 QMAKE_TARGET  = dashboard
 DESTDIR       = 
 TARGET        = dashboard
@@ -231,6 +250,7 @@ Makefile: dashboard.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.co
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -311,6 +331,7 @@ Makefile: dashboard.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.co
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
@@ -350,8 +371,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents dashboard_en_US.ts $(DISTDIR)/
 	$(COPY_FILE) --parents qmake_qmake_qm_files.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents include/SystemCall.hpp include/mainwindow.h include/ThreadManager.hpp include/MyObject.hpp include/DataProvider.hpp include/ProcessInfo.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp src/SystemCall.cpp src/mainwindow.cpp src/ThreadManager.cpp src/MyObject.cpp src/DataProvider.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents include/SystemCall.hpp include/mainwindow.h include/ThreadManager.hpp include/MyObject.hpp include/DataProvider.hpp include/ProcessInfo.h include/SystemCallCPU.hpp include/SystemCallMemory.hpp include/SystemCallProcesses.hpp $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp src/SystemCall.cpp src/mainwindow.cpp src/ThreadManager.cpp src/MyObject.cpp src/DataProvider.cpp src/SystemCallCPU.cpp src/SystemCallMemory.cpp src/SystemCallProcesses.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
 	$(COPY_FILE) --parents dashboard_en_US.ts $(DISTDIR)/
 
@@ -397,9 +418,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -std=gnu++1z -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_SystemCall.cpp moc_mainwindow.cpp moc_ThreadManager.cpp moc_MyObject.cpp moc_DataProvider.cpp
+compiler_moc_header_make_all: moc_SystemCall.cpp moc_mainwindow.cpp moc_ThreadManager.cpp moc_MyObject.cpp moc_DataProvider.cpp moc_SystemCallCPU.cpp moc_SystemCallMemory.cpp moc_SystemCallProcesses.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_SystemCall.cpp moc_mainwindow.cpp moc_ThreadManager.cpp moc_MyObject.cpp moc_DataProvider.cpp
+	-$(DEL_FILE) moc_SystemCall.cpp moc_mainwindow.cpp moc_ThreadManager.cpp moc_MyObject.cpp moc_DataProvider.cpp moc_SystemCallCPU.cpp moc_SystemCallMemory.cpp moc_SystemCallProcesses.cpp
 moc_SystemCall.cpp: include/SystemCall.hpp \
 		include/MyObject.hpp \
 		include/ProcessInfo.h \
@@ -431,6 +452,30 @@ moc_DataProvider.cpp: include/DataProvider.hpp \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/negodrama/Documents/Dashboard/Dashboard/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/negodrama/Documents/Dashboard/Dashboard -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/DataProvider.hpp -o moc_DataProvider.cpp
 
+moc_SystemCallCPU.cpp: include/SystemCallCPU.hpp \
+		include/SystemCall.hpp \
+		include/MyObject.hpp \
+		include/ProcessInfo.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/negodrama/Documents/Dashboard/Dashboard/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/negodrama/Documents/Dashboard/Dashboard -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/SystemCallCPU.hpp -o moc_SystemCallCPU.cpp
+
+moc_SystemCallMemory.cpp: include/SystemCallMemory.hpp \
+		include/SystemCall.hpp \
+		include/MyObject.hpp \
+		include/ProcessInfo.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/negodrama/Documents/Dashboard/Dashboard/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/negodrama/Documents/Dashboard/Dashboard -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/SystemCallMemory.hpp -o moc_SystemCallMemory.cpp
+
+moc_SystemCallProcesses.cpp: include/SystemCallProcesses.hpp \
+		include/SystemCall.hpp \
+		include/MyObject.hpp \
+		include/ProcessInfo.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/negodrama/Documents/Dashboard/Dashboard/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/negodrama/Documents/Dashboard/Dashboard -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/SystemCallProcesses.hpp -o moc_SystemCallProcesses.cpp
+
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
@@ -455,7 +500,12 @@ compiler_clean: compiler_lrelease_clean compiler_rcc_clean compiler_moc_predefs_
 main.o: main.cpp include/mainwindow.h \
 		include/ProcessInfo.h \
 		include/ThreadManager.hpp \
-		include/MyObject.hpp
+		include/MyObject.hpp \
+		include/DataProvider.hpp \
+		include/SystemCall.hpp \
+		include/SystemCallProcesses.hpp \
+		include/SystemCallMemory.hpp \
+		include/SystemCallCPU.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 SystemCall.o: src/SystemCall.cpp include/SystemCall.hpp \
@@ -480,8 +530,23 @@ MyObject.o: src/MyObject.cpp include/MyObject.hpp
 DataProvider.o: src/DataProvider.cpp include/DataProvider.hpp \
 		include/MyObject.hpp \
 		include/ProcessInfo.h \
-		include/SystemCall.hpp
+		include/SystemCall.hpp \
+		include/SystemCallProcesses.hpp \
+		include/SystemCallMemory.hpp \
+		include/SystemCallCPU.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DataProvider.o src/DataProvider.cpp
+
+SystemCallCPU.o: src/SystemCallCPU.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SystemCallCPU.o src/SystemCallCPU.cpp
+
+SystemCallMemory.o: src/SystemCallMemory.cpp include/SystemCallMemory.hpp \
+		include/SystemCall.hpp \
+		include/MyObject.hpp \
+		include/ProcessInfo.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SystemCallMemory.o src/SystemCallMemory.cpp
+
+SystemCallProcesses.o: src/SystemCallProcesses.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SystemCallProcesses.o src/SystemCallProcesses.cpp
 
 qrc_qmake_qmake_qm_files.o: qrc_qmake_qmake_qm_files.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_qmake_qmake_qm_files.o qrc_qmake_qmake_qm_files.cpp
@@ -500,6 +565,15 @@ moc_MyObject.o: moc_MyObject.cpp
 
 moc_DataProvider.o: moc_DataProvider.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_DataProvider.o moc_DataProvider.cpp
+
+moc_SystemCallCPU.o: moc_SystemCallCPU.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_SystemCallCPU.o moc_SystemCallCPU.cpp
+
+moc_SystemCallMemory.o: moc_SystemCallMemory.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_SystemCallMemory.o moc_SystemCallMemory.cpp
+
+moc_SystemCallProcesses.o: moc_SystemCallProcesses.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_SystemCallProcesses.o moc_SystemCallProcesses.cpp
 
 ####### Install
 

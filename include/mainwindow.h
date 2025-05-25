@@ -21,11 +21,11 @@ public:
     ~MainWindow();
 
 private slots:
-    void onProcessListUpdated(const std::vector<ProcessInfo>&);
-    void onSearchTextChanged();
-
+    void onProcessListUpdated(const std::vector<ProcessInfo*>&);
+    void onMemoryListUpdated(const std::vector<MemoryInfo*>&);
+    void onCPUListUpdated(const std::vector<CPUInfo*>&);
+    
 private:
     Ui::MainWindow *ui;
-    std::vector<ProcessInfo> allProcesses;
 };
 #endif // MAINWINDOW_H

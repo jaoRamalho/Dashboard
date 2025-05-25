@@ -1,14 +1,22 @@
 #include "include/DataProvider.hpp"
 #include "include/SystemCall.hpp"
+#include "include/SystemCallProcesses.hpp"
+#include "include/SystemCallMemory.hpp"
+#include "include/SystemCallCPU.hpp"
 #include <thread>
 #include <iostream>
 
 DataProvider* DataProvider::instance = nullptr;
 DataProvider::DataProvider(QObject *parent) : MyObject(parent){
+    nameMyObject = "DataProvider";
+    isRunning = false;
+    delay = 300;
 }
 
 DataProvider::~DataProvider(){
-
+    std::cout << "DataProvider destructor called" << std::endl;
+    isRunning = false; // Ensure the loops stop
+    instance = nullptr; // Clear the singleton instance
 }
 
 DataProvider* DataProvider::getInstance(QObject* parent) {
@@ -18,20 +26,44 @@ DataProvider* DataProvider::getInstance(QObject* parent) {
     return instance;
 }
 
-void DataProvider::loop(){
-    while(isRunning){
+
+void DataProvider::loop() {
+    while (isRunning) {
         std::cout << "DataProvider loop" << std::endl;
-        SystemCall* sysCall = SystemCall::getInstance();
-        if (sysCall->isAccessible()){
-            std::vector<ProcessInfo> processes = sysCall->getProcesses();
-            if (processes.size() == 0) { sysCall->delay = delay = 10; }    
-            else {
-                emit processListUpdated(processes);
-            }       
+        SystemCallCPU* sysCallCPU = SystemCallCPU::getInstance();
+        SystemCallMemory* sysCallMemory = SystemCallMemory::getInstance();
+        SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
+
+        std::vector<ProcessInfo*> processList;
+        std::vector<CPUInfo*> cpuList;
+        std::vector<MemoryInfo*> memoryList;
+
+        for (auto& base : sysCallProcesses->getInfo()) {
+            ProcessInfo* p = dynamic_cast<ProcessInfo*>(base);
+            if (p) processList.push_back(p);
         }
+    
+
+        for (auto& base : sysCallMemory->getInfo()) {
+            MemoryInfo* m = dynamic_cast<MemoryInfo*>(base);
+            if (m) memoryList.push_back(m);
+        }
+
+        for (auto& base : sysCallCPU->getInfo()) {
+            CPUInfo* c = dynamic_cast<CPUInfo*>(base);
+            if (c) cpuList.push_back(c);
+        }
+
+        if (processList.size() > 0)
+            emit processListUpdated(processList);
+        
+        if (memoryList.size() > 0)
+            emit cpuListUpdated(cpuList);
+        
+        if (memoryList.size() > 0)
+            emit memoryListUpdated(memoryList);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         if(delay != DEFAULT_DELAY) { delay = DEFAULT_DELAY; }
     }
 }
-

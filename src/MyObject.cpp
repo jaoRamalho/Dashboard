@@ -1,7 +1,7 @@
 #include "include/MyObject.hpp"
 
 
-MyObject::MyObject(QObject* parent) : QObject(parent) {
+MyObject::MyObject(QObject* parent) : QObject(parent), nameMyObject("MyObject") {
     delay = DEFAULT_DELAY;
 }
 
