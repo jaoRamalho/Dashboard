@@ -1,4 +1,5 @@
 #include "include/ThreadManager.hpp"
+
 #include <iostream>
 
 ThreadManager::ThreadManager(QObject* parent) : QObject(parent){

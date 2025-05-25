@@ -1,10 +1,11 @@
 #ifndef SYSTEMINFO_HPP
 #define SYSTEMINFO_HPP
 
+#include "ProcessInfo.h"
 #include "MyObject.hpp"
+
 #include <vector>
 #include <string>
-#include "ProcessInfo.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>

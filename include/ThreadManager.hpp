@@ -2,6 +2,7 @@
 #define THREADMANAGER_H
 
 #include "MyObject.hpp"
+
 #include <QThread>
 #include <unordered_map>
 #include <string>

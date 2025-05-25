@@ -1,6 +1,7 @@
 #include "include/mainwindow.h"
 #include "ui_mainwindow.h"
 #include "include/DataProvider.hpp"
+
 #include <QTableWidgetItem>
 #include <iostream>
 #include <QLineEdit>

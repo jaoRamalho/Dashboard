@@ -2,7 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+
 #include "include/ProcessInfo.h"
+
 #include <vector>
 
 

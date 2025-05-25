@@ -1,5 +1,6 @@
 #include "include/SystemCallProcesses.hpp"
-#include <pwd.h> // Para getpwuid
+
+#include <pwd.h> 
 #include <sys/types.h>
 
 SystemCallProcesses* SystemCallProcesses::instance = nullptr;

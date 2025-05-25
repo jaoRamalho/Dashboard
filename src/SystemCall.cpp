@@ -1,9 +1,7 @@
 #include "include/SystemCall.hpp"
-#include <filesystem>
-#include <fstream>
+
 #include <pwd.h>
 #include <unistd.h>
-#include <iostream>
 #include <thread>
 
 

@@ -1,10 +1,9 @@
 #include "include/DataProvider.hpp"
-#include "include/SystemCall.hpp"
 #include "include/SystemCallProcesses.hpp"
 #include "include/SystemCallMemory.hpp"
 #include "include/SystemCallCPU.hpp"
+
 #include <thread>
-#include <iostream>
 
 DataProvider* DataProvider::instance = nullptr;
 DataProvider::DataProvider(QObject *parent) : MyObject(parent){
