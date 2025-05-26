@@ -21,13 +21,16 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::onProcessListUpdated(const std::vector<ProcessInfo*>& list) {
-    std::cout << "Process list updated" << std::endl;
+
+
 }
 
 void MainWindow::onMemoryListUpdated(const std::vector<MemoryInfo*>& list) {
-    std::cout << "Memory list updated" << std::endl;
+
+
 }
 
 void MainWindow::onCPUListUpdated(const std::vector<CPUInfo*>& list) {
-    std::cout << "CPU list updated" << std::endl;
+
+
 }

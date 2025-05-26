@@ -59,24 +59,10 @@ void SystemCallMemory::updateMemory() {
 
 void SystemCallMemory::loop() {
     while (isRunning) {
-        std::cout << "---------------------------------------------------" << std::endl;
         std::cout << "SystemCallMemory loop" << std::endl;
         acessible = false;
         updateMemory();
         acessible = true;
-
-        if (!info.empty()) {
-            MemoryInfo* mem = dynamic_cast<MemoryInfo*>(info[0]);
-            if (mem) {
-                std::cout << "Total: " << mem->total << " kB" << std::endl;
-                std::cout << "Free: " << mem->free << " kB" << std::endl;
-                std::cout << "Used: " << mem->used << " kB" << std::endl;
-                std::cout << "Buffers: " << mem->buffers << " kB" << std::endl;
-                std::cout << "Cached: " << mem->cached << " kB" << std::endl;
-            }
-        }
-
-        std::cout << "---------------------------------------------------" << std::endl;
 
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     }

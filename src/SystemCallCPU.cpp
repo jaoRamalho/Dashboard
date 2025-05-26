@@ -89,24 +89,10 @@ void SystemCallCPU::updateCPU() {
 
 void SystemCallCPU::loop() {
     while (isRunning) {
-        std::cout << "---------------------------------------------------" << std::endl;
         std::cout << "SystemCallCPU loop" << std::endl;
         acessible = false;
         updateCPU();
         acessible = true;
-
-        std::cout << "CPU info updated" << std::endl;
-        for (const auto& base : info) {
-            CPUInfo* c = dynamic_cast<CPUInfo*>(base);
-            if (c) {
-                std::cout << "CPU ID: " << c->cpu << ", Model: " << c->modelName
-                          << ", Model Number: " << c->modelNumber
-                          << ", Idle Time: " << c->idleTime
-                          << ", CPU MHz: " << c->cpuMhz << std::endl;
-            }
-        }
-        std::cout << "---------------------------------------------------" << std::endl;
-
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     }
 }

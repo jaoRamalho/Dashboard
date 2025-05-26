@@ -141,37 +141,10 @@ TreadsInfo SystemCallProcesses::getThreadInfo(std::string pid, std::string tid){
 
 void SystemCallProcesses::loop() {
     while (isRunning) {
-        std::cout << "---------------------------------------------------" << std::endl;
         std::cout << "SystemCallProcesses loop" << std::endl;
         acessible = false;
         updateProcesses();
-        acessible = true;
-
-        std::cout << "Processes info updated" << std::endl;
-        std::cout << "Number of processes: " << info.size() << std::endl;
-        for (const auto& base : info) {
-            ProcessInfo* p = dynamic_cast<ProcessInfo*>(base);
-            if (!p) continue;
-            std::cout << "PID: " << p->pid << ", Name: " << p->name
-                    << ", User: " << p->user
-                    << ", Memory: " << p->memory
-                    << ", State: " << p->state
-                    << ", Threads: " << p->n_threads
-                    << ", Voluntary Switches: " << p->swichContextVoluntary
-                    << ", Involuntary Switches: " << p->swichContextInvoluntary
-                    << std::endl;
-            for (const auto& thread : p->threads) {
-                std::cout << "  Thread ID: " << thread.tid
-                        << ", Name: " << thread.name
-                        << ", User: " << thread.user
-                        << ", Memory: " << thread.memory
-                        << ", Voluntary Switches: " << thread.swichContextVoluntary
-                        << ", Involuntary Switches: " << thread.swichContextInvoluntary
-                        << ", State: " << thread.state << std::endl;
-            }
-        }
-        std::cout << "---------------------------------------------------" << std::endl;
-        
+        acessible = true;        
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     }
 }
