@@ -21,12 +21,14 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    std::vector<ProcessInfo*> copyProcess;
 
 private slots:
     void onProcessListUpdated(const std::vector<ProcessInfo*>&);
     void onMemoryListUpdated(const std::vector<MemoryInfo*>&);
     void onCPUListUpdated(const std::vector<CPUInfo*>&);
-    
+    void onProcessClicked(int row, int column);
+
 private:
     Ui::MainWindow *ui;
 };

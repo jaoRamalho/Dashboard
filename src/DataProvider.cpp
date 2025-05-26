@@ -68,3 +68,16 @@ void DataProvider::loop() {
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     }
 }
+
+const ProcessInfo* DataProvider::getProcessByPID(const std::string& pid) const {
+    SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
+    if (!sysCallProcesses->isAccessible()) return nullptr;
+
+    for (auto& base : sysCallProcesses->getInfo()) {
+        ProcessInfo* process = dynamic_cast<ProcessInfo*>(base);
+        if (process && process->pid == pid) {
+            return process;
+        }
+    }
+    return nullptr;
+}

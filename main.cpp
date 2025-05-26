@@ -9,7 +9,6 @@
 
 #include <iostream>
 
-
 int main(int argc, char *argv[])
 {
     qRegisterMetaType<std::vector<InfoBase*>>("std::vector<InfoBase*>");

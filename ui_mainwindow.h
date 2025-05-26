@@ -25,8 +25,11 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralwidget;
-    QTableWidget *processTable;
+    QTableWidget *processesView;
     QLineEdit *processSearchEdit;
+    QTableWidget *threadsView;
+    QTableWidget *cpuView;
+    QTableWidget *memoryView;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -34,7 +37,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(763, 592);
+        MainWindow->resize(1228, 719);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -43,17 +46,29 @@ public:
         sizePolicy.setHeightForWidth(centralwidget->sizePolicy().hasHeightForWidth());
         centralwidget->setSizePolicy(sizePolicy);
         centralwidget->setAutoFillBackground(false);
-        processTable = new QTableWidget(centralwidget);
-        processTable->setObjectName(QString::fromUtf8("processTable"));
-        processTable->setGeometry(QRect(20, 50, 731, 481));
-        processTable->setMaximumSize(QSize(16777215, 481));
+        processesView = new QTableWidget(centralwidget);
+        processesView->setObjectName(QString::fromUtf8("processesView"));
+        processesView->setGeometry(QRect(20, 50, 651, 611));
+        processesView->setMaximumSize(QSize(16777215, 16777215));
         processSearchEdit = new QLineEdit(centralwidget);
         processSearchEdit->setObjectName(QString::fromUtf8("processSearchEdit"));
-        processSearchEdit->setGeometry(QRect(20, 20, 731, 27));
+        processSearchEdit->setGeometry(QRect(20, 10, 651, 31));
+        threadsView = new QTableWidget(centralwidget);
+        threadsView->setObjectName(QString::fromUtf8("threadsView"));
+        threadsView->setGeometry(QRect(680, 10, 531, 291));
+        threadsView->setMaximumSize(QSize(16777215, 481));
+        cpuView = new QTableWidget(centralwidget);
+        cpuView->setObjectName(QString::fromUtf8("cpuView"));
+        cpuView->setGeometry(QRect(680, 310, 531, 141));
+        cpuView->setMaximumSize(QSize(16777215, 481));
+        memoryView = new QTableWidget(centralwidget);
+        memoryView->setObjectName(QString::fromUtf8("memoryView"));
+        memoryView->setGeometry(QRect(680, 460, 531, 201));
+        memoryView->setMaximumSize(QSize(16777215, 481));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 763, 24));
+        menubar->setGeometry(QRect(0, 0, 1228, 24));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
