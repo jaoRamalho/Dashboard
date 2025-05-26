@@ -1,4 +1,4 @@
-#include "moreinforswindow.h"
+#include "include/moreinforswindow.h"
 
 moreinforswindow::moreinforswindow(QWidget *parent) :
     QDialog(parent),
