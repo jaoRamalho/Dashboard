@@ -1,14 +1,5 @@
 #include "include/mainwindow.h"
-#include "include/ThreadManager.hpp"
-#include "include/DataProvider.hpp"
-#include "include/SystemCall.hpp"
-#include "include/SystemCallProcesses.hpp"
-#include "include/SystemCallMemory.hpp"
-#include "include/ProcessInfo.h"
-#include "include/MyObject.hpp"
-#include "include/ProcessInfo.h"
-#include "include/SystemCallCPU.hpp"
-
+#include "include/Dashboard.hpp"
 
 
 #include <QMetaType>
@@ -38,29 +29,11 @@ int main(int argc, char *argv[])
         }
     }
     
-    
-    ThreadManager* threadManager = new ThreadManager();
-    SystemCallMemory* sysCallMemory = SystemCallMemory::getInstance();
-    SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
-    SystemCallCPU* sysCallCPU = SystemCallCPU::getInstance();
-    DataProvider* dataProvider = DataProvider::getInstance();
-
-
-    threadManager->startNewThread(sysCallMemory);
-    threadManager->startNewThread(sysCallProcesses);
-    threadManager->startNewThread(sysCallCPU);
-    threadManager->startNewThread(dataProvider);
-
+    Dashboard* dashboard = new Dashboard();
+    dashboard->start();
     MainWindow w;
     w.show();
-    a.exec();
-    std::cout << "Main window closed" << std::endl;
-    std::cout << "Stopping threads..." << std::endl;
-
-    sysCallCPU->stop();
-    sysCallMemory->stop();
-    sysCallProcesses->stop();
-    dataProvider->stop();
-    threadManager->stopAll();
-    return 0;
+    int r = a.exec();
+    dashboard->stop();
+    return r;
 }

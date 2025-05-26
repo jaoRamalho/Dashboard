@@ -60,7 +60,8 @@ SOURCES       = main.cpp \
 		src/DataProvider.cpp \
 		src/SystemCallCPU.cpp \
 		src/SystemCallMemory.cpp \
-		src/SystemCallProcesses.cpp qrc_qmake_qmake_qm_files.cpp \
+		src/SystemCallProcesses.cpp \
+		src/Dashboard.cpp qrc_qmake_qmake_qm_files.cpp \
 		moc_SystemCall.cpp \
 		moc_mainwindow.cpp \
 		moc_ThreadManager.cpp \
@@ -78,6 +79,7 @@ OBJECTS       = main.o \
 		SystemCallCPU.o \
 		SystemCallMemory.o \
 		SystemCallProcesses.o \
+		Dashboard.o \
 		qrc_qmake_qmake_qm_files.o \
 		moc_SystemCall.o \
 		moc_mainwindow.o \
@@ -173,7 +175,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		include/ProcessInfo.h \
 		include/SystemCallCPU.hpp \
 		include/SystemCallMemory.hpp \
-		include/SystemCallProcesses.hpp main.cpp \
+		include/SystemCallProcesses.hpp \
+		include/Dashboard.hpp main.cpp \
 		src/SystemCall.cpp \
 		src/mainwindow.cpp \
 		src/ThreadManager.cpp \
@@ -181,7 +184,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		src/DataProvider.cpp \
 		src/SystemCallCPU.cpp \
 		src/SystemCallMemory.cpp \
-		src/SystemCallProcesses.cpp
+		src/SystemCallProcesses.cpp \
+		src/Dashboard.cpp
 QMAKE_TARGET  = dashboard
 DESTDIR       = 
 TARGET        = dashboard
@@ -371,8 +375,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents dashboard_en_US.ts $(DISTDIR)/
 	$(COPY_FILE) --parents qmake_qmake_qm_files.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents include/SystemCall.hpp include/mainwindow.h include/ThreadManager.hpp include/MyObject.hpp include/DataProvider.hpp include/ProcessInfo.h include/SystemCallCPU.hpp include/SystemCallMemory.hpp include/SystemCallProcesses.hpp $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp src/SystemCall.cpp src/mainwindow.cpp src/ThreadManager.cpp src/MyObject.cpp src/DataProvider.cpp src/SystemCallCPU.cpp src/SystemCallMemory.cpp src/SystemCallProcesses.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents include/SystemCall.hpp include/mainwindow.h include/ThreadManager.hpp include/MyObject.hpp include/DataProvider.hpp include/ProcessInfo.h include/SystemCallCPU.hpp include/SystemCallMemory.hpp include/SystemCallProcesses.hpp include/Dashboard.hpp $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp src/SystemCall.cpp src/mainwindow.cpp src/ThreadManager.cpp src/MyObject.cpp src/DataProvider.cpp src/SystemCallCPU.cpp src/SystemCallMemory.cpp src/SystemCallProcesses.cpp src/Dashboard.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
 	$(COPY_FILE) --parents dashboard_en_US.ts $(DISTDIR)/
 
@@ -499,9 +503,10 @@ compiler_clean: compiler_lrelease_clean compiler_rcc_clean compiler_moc_predefs_
 
 main.o: main.cpp include/mainwindow.h \
 		include/ProcessInfo.h \
-		include/ThreadManager.hpp \
+		include/Dashboard.hpp \
 		include/MyObject.hpp \
 		include/DataProvider.hpp \
+		include/ThreadManager.hpp \
 		include/SystemCall.hpp \
 		include/SystemCallProcesses.hpp \
 		include/SystemCallMemory.hpp \
@@ -553,6 +558,17 @@ SystemCallProcesses.o: src/SystemCallProcesses.cpp include/SystemCallProcesses.h
 		include/ProcessInfo.h \
 		include/MyObject.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SystemCallProcesses.o src/SystemCallProcesses.cpp
+
+Dashboard.o: src/Dashboard.cpp include/Dashboard.hpp \
+		include/ProcessInfo.h \
+		include/MyObject.hpp \
+		include/DataProvider.hpp \
+		include/ThreadManager.hpp \
+		include/SystemCall.hpp \
+		include/SystemCallProcesses.hpp \
+		include/SystemCallMemory.hpp \
+		include/SystemCallCPU.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Dashboard.o src/Dashboard.cpp
 
 qrc_qmake_qmake_qm_files.o: qrc_qmake_qmake_qm_files.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_qmake_qmake_qm_files.o qrc_qmake_qmake_qm_files.cpp

@@ -17,7 +17,8 @@ SOURCES += \
     src/DataProvider.cpp \ 
     src/SystemCallCPU.cpp \
     src/SystemCallMemory.cpp \
-    src/SystemCallProcesses.cpp
+    src/SystemCallProcesses.cpp \
+    src/Dashboard.cpp
 
 HEADERS += \
     include/SystemCall.hpp \
@@ -28,7 +29,8 @@ HEADERS += \
     include/ProcessInfo.h \
     include/SystemCallCPU.hpp \ 
     include/SystemCallMemory.hpp \
-    include/SystemCallProcesses.hpp 
+    include/SystemCallProcesses.hpp \
+    include/Dashboard.hpp
 
 FORMS += \
     mainwindow.ui
