@@ -2,8 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+
+#include <mutex>
 #include "include/ProcessInfo.h"
-#include <vector>
+
 
 
 QT_BEGIN_NAMESPACE
@@ -19,13 +21,24 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    std::mutex processMutex; 
+    
 
 private slots:
-    void onProcessListUpdated(const std::vector<ProcessInfo>&);
-    void onSearchTextChanged();
+    void onProcessListUpdated(const std::vector<ProcessInfo*>);
+    void onMemoryListUpdated(const std::vector<MemoryInfo*>);
+    void onCPUListUpdated(const std::vector<CPUInfo*>);
+    void updateGeneralDataProcess(const std::vector<ProcessInfo*>);
+    void updateGeneralDataMemory(const std::vector<MemoryInfo*>);
+    void updateGeneralDataCPU(const std::vector<CPUInfo*>);
 
+    void onClickedButtonProcess();
+    void onClickedButtonMemory();
+    void onClickedButtonPerformace();
+    void onClickedButtonFiles();
+    
+    void onProcessTableRowClicked(int row);
 private:
     Ui::MainWindow *ui;
-    std::vector<ProcessInfo> allProcesses;
 };
 #endif // MAINWINDOW_H

@@ -15,6 +15,10 @@ SOURCES += \
     src/ThreadManager.cpp \
     src/MyObject.cpp \
     src/DataProvider.cpp \ 
+    src/SystemCallCPU.cpp \
+    src/SystemCallMemory.cpp \
+    src/SystemCallProcesses.cpp \
+    src/Dashboard.cpp
 
 HEADERS += \
     include/SystemCall.hpp \
@@ -22,7 +26,11 @@ HEADERS += \
     include/ThreadManager.hpp \
     include/MyObject.hpp \
     include/DataProvider.hpp \
-    include/ProcessInfo.h
+    include/ProcessInfo.h \
+    include/SystemCallCPU.hpp \ 
+    include/SystemCallMemory.hpp \
+    include/SystemCallProcesses.hpp \
+    include/Dashboard.hpp
 
 FORMS += \
     mainwindow.ui

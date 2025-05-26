@@ -1,36 +1,32 @@
 #ifndef SYSTEMINFO_HPP
 #define SYSTEMINFO_HPP
 
+#include "ProcessInfo.h"
 #include "MyObject.hpp"
+
 #include <vector>
 #include <string>
-#include "ProcessInfo.h"
-
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <thread>
+#include <chrono>
+#include <filesystem>
+#include <mutex>
 
 class SystemCall : public MyObject{
     Q_OBJECT
-private:
-    // Singleton instance
-    static SystemCall* instance;
+protected:
+    std::mutex mtx;
+    bool acessible;
+    std::vector<InfoBase*> info;
     
-    volatile bool acessible; 
-    std::vector<ProcessInfo> processes;
-    
-    #define ENABLE_ACCESS() { acessible = true; }
-    #define DISABLE_ACCESS() { acessible = false;}
-    
-    void updateProcesses();
-    
-    SystemCall(QObject* parent = nullptr);
 public: 
-    static SystemCall* getInstance(QObject* parent = nullptr);
+    SystemCall(QObject* parent = nullptr);
     ~SystemCall();
+
     bool isAccessible() const { return acessible; }
-    std::vector<ProcessInfo> getProcesses();
-    
-public slots:
-    void loop() override;
-    
+    std::vector<InfoBase*> getInfo();
 };
 
 #endif // SYSTEMINFO_HPP

@@ -1,9 +1,13 @@
 #include "include/mainwindow.h"
 #include "ui_mainwindow.h"
 #include "include/DataProvider.hpp"
+#include "include/SystemCallProcesses.hpp"
+#include <QStringListModel> // Adicionado para corrigir o erro de QStringListModel
+
 #include <QTableWidgetItem>
 #include <iostream>
 #include <QLineEdit>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -11,57 +15,232 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     connect(DataProvider::getInstance(), &DataProvider::processListUpdated, this, &MainWindow::onProcessListUpdated);
-    connect(ui->processSearchEdit, &QLineEdit::textChanged, this, &MainWindow::onSearchTextChanged);
+    connect(DataProvider::getInstance(), &DataProvider::cpuListUpdated, this, &MainWindow::onCPUListUpdated);
+    connect(DataProvider::getInstance(), &DataProvider::memoryListUpdated, this, &MainWindow::onMemoryListUpdated);
+    connect(ui->ProcessButton, &QPushButton::clicked, this, &MainWindow::onClickedButtonProcess);
+    connect(ui->PerformanceButton, &QPushButton::clicked, this, &MainWindow::onClickedButtonPerformace);
+    connect(ui->MemoryButton, &QPushButton::clicked, this, &MainWindow::onClickedButtonMemory);
+    connect(ui->FilesButton, &QPushButton::clicked, this, &MainWindow::onClickedButtonFiles);
+    connect(ui->processTable, &QTableWidget::cellClicked, this, &MainWindow::onProcessTableRowClicked);
 }
 
 MainWindow::~MainWindow(){
     delete ui;
 }
 
-void MainWindow::onProcessListUpdated(const std::vector<ProcessInfo>& list) {
-    std::cout << "Process list updated with " << list.size() << " processes." << std::endl;
-    allProcesses = list; // Armazena a lista completa para filtragem
- 
-    QString filter = ui->processSearchEdit->text();
-    std::vector<ProcessInfo> filtered;
+void MainWindow::onProcessTableRowClicked(int row) {
+    if (row < 0 || row >= ui->processTable->rowCount()) {
+        return; // Verifica se a linha é válida
+    }
 
-    if (!filter.isEmpty()) {
-        for (const auto& p : allProcesses) {
-            if (QString::fromStdString(p.name).contains(filter, Qt::CaseInsensitive)) {
-                filtered.push_back(p);
+    QTableWidgetItem* item = ui->processTable->item(row, 0); // Obtém o item da coluna PID
+    if (item) {
+        QString pid = item->text();
+
+        std::lock_guard<std::mutex> lock(processMutex); // Protege o acesso à lista de processos
+        std::vector<InfoBase*> baseCopy = SystemCallProcesses::getInstance()->getInfo();
+        
+        // Obtém o vetor de InfoBase* e converte para ProcessInfo*
+        std::vector<ProcessInfo*> copy;
+        for (InfoBase* base : baseCopy) {
+            if (ProcessInfo* process = dynamic_cast<ProcessInfo*>(base)) {
+                copy.push_back(process); // Adiciona ao vetor apenas se for ProcessInfo*
             }
         }
-    } else {
-        filtered = allProcesses;
-    }
- 
-    ui->processTable->setRowCount(static_cast<int>(filtered.size()));
-    ui->processTable->setColumnCount(6);
-    QStringList headers = {"PID", "Nome", "Usuário", "Memória (KB)", "Numero de Threads", "Threads ID"};
-    ui->processTable->setHorizontalHeaderLabels(headers);
 
-    for (int row = 0; row < static_cast<int>(filtered.size()); ++row) {
-        
-        const ProcessInfo& p = filtered[row];
-        ui->processTable->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(p.pid)));
-        ui->processTable->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(p.name)));
-        ui->processTable->setItem(row, 2, new QTableWidgetItem(QString::fromStdString(p.user)));
-        ui->processTable->setItem(row, 3, new QTableWidgetItem(QString::number(p.memory)));
-        ui->processTable->setItem(row, 4, new QTableWidgetItem(QString::number(p.n_threads)));
-        // Junta os threads em uma string só
-        QString threads = QString::fromStdString(
-            std::accumulate(
-                p.threadsID.begin(), p.threadsID.end(), std::string(),
-                [](const std::string& a, const std::string& b) {
-                    return a.empty() ? b : a + ", " + b;
+        for (auto& process : copy) {
+            if (!process) {
+                std::cout << "Processo nulo encontrado, pulando..." << std::endl;
+                continue; // Verifica se o ponteiro é válido
+            }
+
+            if (QString::fromStdString(process->pid) == pid) {
+                // Limpa a tabela de detalhes
+                if (process->threads.empty()) {
+                    std::cout << "Nenhuma thread encontrada para o processo com PID: " << process->pid << std::endl;
+                    return; // Se não houver threads, não faz nada
                 }
-            )
-        );
-        ui->processTable->setItem(row, 5, new QTableWidgetItem(threads));
+                QStringList headers = {"TID", "Nome", "User", "Memory (KB)", "Switch Context Involuntary", "Switch Context Voluntary", "State"};
+                ui->ProcessDataViewA->clearContents();
+                ui->ProcessDataViewA->clear();
+                ui->ProcessDataViewA->setRowCount(process->threads.size());
+                ui->ProcessDataViewA->setColumnCount(7); // Exemplo: PID, Nome
+                ui->ProcessDataViewA->setHorizontalHeaderLabels(headers);
+
+                for (size_t i = 0; i < process->threads.size(); ++i) {
+                    const TreadsInfo& thread = process->threads[i];
+                    ui->ProcessDataViewA->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(thread.tid)));
+                    ui->ProcessDataViewA->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(thread.name)));
+                    ui->ProcessDataViewA->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(thread.user)));
+                    ui->ProcessDataViewA->setItem(i, 3, new QTableWidgetItem(QString::number(thread.memory)));
+                    ui->ProcessDataViewA->setItem(i, 4, new QTableWidgetItem(QString::number(thread.swichContextInvoluntary)));
+                    ui->ProcessDataViewA->setItem(i, 5, new QTableWidgetItem(QString::number(thread.swichContextVoluntary)));
+                    ui->ProcessDataViewA->setItem(i, 6, new QTableWidgetItem(QString::fromStdString(thread.state)));
+                }
+
+                break; // Encerra o loop após encontrar o processo
+            }
+        }
     }
 }
 
-void MainWindow::onSearchTextChanged() {
-    // Armazene a lista completa em um membro, por exemplo: this->allProcesses
-    onProcessListUpdated(allProcesses);
+void MainWindow::onClickedButtonProcess() {
+    ui->ProcessDataViewA->clear();
+    ui->ProcessButton->setChecked(true);
+    ui->MemoryButton->setChecked(false);
+    ui->PerformanceButton->setChecked(false);
+    ui->FilesButton->setChecked(false);
+}
+
+void MainWindow::onClickedButtonMemory() {
+    ui->ProcessDataViewA->clear();
+    ui->MemoryButton->setChecked(true);
+    ui->ProcessButton->setChecked(false);
+    ui->PerformanceButton->setChecked(false);
+    ui->FilesButton->setChecked(false);
+
+}
+
+void MainWindow::onClickedButtonPerformace() {
+    ui->ProcessDataViewA->clear();
+    ui->PerformanceButton->setChecked(true);
+    ui->ProcessButton->setChecked(false);
+    ui->MemoryButton->setChecked(false);
+    ui->FilesButton->setChecked(false);
+}
+
+void MainWindow::onClickedButtonFiles() {
+    ui->ProcessDataViewA->clear();
+    ui->FilesButton->setChecked(true);
+    ui->ProcessButton->setChecked(false);
+    ui->MemoryButton->setChecked(false);
+    ui->PerformanceButton->setChecked(false);
+}
+
+
+   
+void MainWindow::updateGeneralDataProcess(const std::vector<ProcessInfo*> list) {
+    if (list.empty() || !ui->ProcessButton->isChecked()) {
+        return; // Se a lista estiver vazia, não faz nada
+    }
+
+    int qtdTotalProcessos = list.size();
+    
+    int qtdTotalThreads = 0;
+    for (auto &process : list) {
+        qtdTotalThreads += process->n_threads; // Soma o número de threads de cada processo
+    }
+
+    unsigned long totalMemory = 0;
+    for (const auto &process : list) {
+        totalMemory += process->memory; // Soma a memória de cada processo
+    }
+
+    ui->GeneralDataView->clearContents();
+    ui->GeneralDataView->clear(); // Limpa a tabela antes de adicionar novos dados
+    ui->GeneralDataView->setRowCount(1);
+    ui->GeneralDataView->setColumnCount(3); // Duas colunas: Descrição e Valor
+    QStringList headers = {"Total Processes", "Total Threads", "Total Memory (MB)"};
+    ui->GeneralDataView->setHorizontalHeaderLabels(headers);
+    ui->GeneralDataView->setItem(0, 0, new QTableWidgetItem(QString::number(qtdTotalProcessos)));
+    ui->GeneralDataView->setItem(0, 1, new QTableWidgetItem(QString::number(qtdTotalThreads)));
+    ui->GeneralDataView->setItem(0, 2, new QTableWidgetItem(QString::number(totalMemory / 1024))); // Convertendo para MB
+    ui->GeneralDataView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+}
+
+void MainWindow::updateGeneralDataMemory(const std::vector<MemoryInfo*> list) {
+    if (list.empty() || !ui->MemoryButton->isChecked()) {
+        return; // Se a lista estiver vazia, não faz nada
+    }
+
+}
+
+void MainWindow::onProcessListUpdated(const std::vector<ProcessInfo*> list) {
+    if(list.empty()) { 
+        return; 
+    } 
+    
+    ui->processTable->clearContents();
+    ui->processTable->clear();
+    ui->processTable->setRowCount(list.size());
+    updateGeneralDataProcess(list); // Atualiza os dados gerais dos processos
+    
+    ui->processTable->setColumnCount(8); // Exemplo: PID, Nome, Usuário, Memória
+    QStringList headers = {"PID", "Nome", "Usuário", "Memória(KB)", "N Threads", "Switch Context Involuntary", "Switch Context Voluntary", "State"};
+    ui->processTable->setHorizontalHeaderLabels(headers);
+
+    for (size_t row = 0; row < list.size(); ++row) { // Alterado int para size_t
+        const ProcessInfo* p = list[row];
+        ui->processTable->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(p->pid)));
+        ui->processTable->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(p->name)));
+        ui->processTable->setItem(row, 2, new QTableWidgetItem(QString::fromStdString(p->user)));
+        ui->processTable->setItem(row, 3, new QTableWidgetItem(QString::number(p->memory)));  
+        ui->processTable->setItem(row, 4, new QTableWidgetItem(QString::number(p->threads.size()))); // Número de threads
+        ui->processTable->setItem(row, 5, new QTableWidgetItem(QString::number(p->swichContextInvoluntary)));
+        ui->processTable->setItem(row, 6, new QTableWidgetItem(QString::number(p->swichContextVoluntary)));
+        ui->processTable->setItem(row, 7, new QTableWidgetItem(QString::fromStdString(p->state)));
+    }   
+}
+
+void MainWindow::updateGeneralDataCPU(const std::vector<CPUInfo*> list) {
+    if (list.empty() || !ui->PerformanceButton->isChecked()) {
+        return; // Se a lista estiver vazia, não faz nada
+    }
+
+
+}
+
+void MainWindow::onMemoryListUpdated(const std::vector<MemoryInfo*> list) {
+    if (list.empty() || !ui->MemoryButton->isChecked()) {
+        return; // Se a lista estiver vazia, não faz nada
+    }
+    
+    unsigned long totalMemory = 0;
+    unsigned long freeMemory = 0;
+    unsigned long usedMemory = 0;
+    unsigned long buffers = 0;
+    unsigned long cached = 0;
+
+    for (const auto &mem : list) {
+        totalMemory += mem->total;
+        freeMemory += mem->free;
+        usedMemory += mem->used;
+        buffers += mem->buffers;
+        cached += mem->cached;
+    }
+
+    ui->GeneralDataView->clearContents();
+    ui->ProcessDataViewA->clear();
+    ui->ProcessDataViewA->setRowCount(1);
+    ui->ProcessDataViewA->setColumnCount(5); // Total, Free, Used, Buffers, Cached
+    QStringList headers = {"Total (MB)", "Free (MB)", "Used (MB)", "Buffers (MB)", "Cached (MB)"};
+    ui->ProcessDataViewA->setHorizontalHeaderLabels(headers);
+    
+    ui->ProcessDataViewA->setItem(0, 0, new QTableWidgetItem(QString::number(totalMemory / 1024)));
+    ui->ProcessDataViewA->setItem(0, 1, new QTableWidgetItem(QString::number(freeMemory / 1024)));
+    ui->ProcessDataViewA->setItem(0, 2, new QTableWidgetItem(QString::number(usedMemory / 1024)));
+    ui->ProcessDataViewA->setItem(0, 3, new QTableWidgetItem(QString::number(buffers / 1024)));
+    ui->ProcessDataViewA->setItem(0, 4, new QTableWidgetItem(QString::number(cached / 1024)));
+
+}
+
+void MainWindow::onCPUListUpdated(const std::vector<CPUInfo*> list) {
+    if(list.empty() || !ui->PerformanceButton->isChecked()) {
+        return; // Se a lista estiver vazia, não faz nada
+    }
+
+    ui->ProcessDataViewA->clearContents();
+    ui->ProcessDataViewA->clear();
+    ui->ProcessDataViewA->setRowCount(list.size());
+    ui->ProcessDataViewA->setColumnCount(5); // Exemplo: CPU, Modelo, Número do Modelo, Tempo de Inatividade, MHz
+    QStringList headers = {"CPU", "Modelo", "Número do Modelo", "Tempo de Inatividade (%)", "MHz"};
+    ui->ProcessDataViewA->setHorizontalHeaderLabels(headers);
+    for (size_t row = 0; row < list.size(); ++row) { // Alterado int para size_t
+        const CPUInfo* c = list[row];
+        ui->ProcessDataViewA->setItem(row, 0, new QTableWidgetItem(QString::number(c->cpu)));
+        ui->ProcessDataViewA->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(c->modelName)));
+        ui->ProcessDataViewA->setItem(row, 2, new QTableWidgetItem(QString::number(c->modelNumber)));
+        ui->ProcessDataViewA->setItem(row, 3, new QTableWidgetItem(QString::number(c->idleTime)));
+        ui->ProcessDataViewA->setItem(row, 4, new QTableWidgetItem(QString::number(c->cpuMhz)));
+    }
 }

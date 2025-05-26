@@ -107,9 +107,9 @@ border-radius: 16px;
            <colorrole role="Button">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>0</green>
-              <blue>0</blue>
+              <red>37</red>
+              <green>37</green>
+              <blue>37</blue>
              </color>
             </brush>
            </colorrole>
@@ -179,18 +179,18 @@ border-radius: 16px;
            <colorrole role="Base">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>0</green>
-              <blue>0</blue>
+              <red>37</red>
+              <green>37</green>
+              <blue>37</blue>
              </color>
             </brush>
            </colorrole>
            <colorrole role="Window">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>0</green>
-              <blue>0</blue>
+              <red>37</red>
+              <green>37</green>
+              <blue>37</blue>
              </color>
             </brush>
            </colorrole>
@@ -253,9 +253,9 @@ border-radius: 16px;
            <colorrole role="Button">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>0</green>
-              <blue>0</blue>
+              <red>37</red>
+              <green>37</green>
+              <blue>37</blue>
              </color>
             </brush>
            </colorrole>
@@ -325,18 +325,18 @@ border-radius: 16px;
            <colorrole role="Base">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>0</green>
-              <blue>0</blue>
+              <red>37</red>
+              <green>37</green>
+              <blue>37</blue>
              </color>
             </brush>
            </colorrole>
            <colorrole role="Window">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>0</green>
-              <blue>0</blue>
+              <red>37</red>
+              <green>37</green>
+              <blue>37</blue>
              </color>
             </brush>
            </colorrole>
@@ -399,9 +399,9 @@ border-radius: 16px;
            <colorrole role="Button">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>0</green>
-              <blue>0</blue>
+              <red>37</red>
+              <green>37</green>
+              <blue>37</blue>
              </color>
             </brush>
            </colorrole>
@@ -471,18 +471,18 @@ border-radius: 16px;
            <colorrole role="Base">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>0</green>
-              <blue>0</blue>
+              <red>37</red>
+              <green>37</green>
+              <blue>37</blue>
              </color>
             </brush>
            </colorrole>
            <colorrole role="Window">
             <brush brushstyle="SolidPattern">
              <color alpha="255">
-              <red>0</red>
-              <green>0</green>
-              <blue>0</blue>
+              <red>37</red>
+              <green>37</green>
+              <blue>37</blue>
              </color>
             </brush>
            </colorrole>
@@ -610,6 +610,18 @@ border-radius: 16px;</string>
         <property name="text">
          <string>Process</string>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeatInterval">
+         <number>300</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -644,6 +656,15 @@ border-radius: 16px;</string>
         </property>
         <property name="text">
          <string>Performance</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeatInterval">
+         <number>300</number>
         </property>
        </widget>
       </item>
@@ -680,6 +701,15 @@ border-radius: 16px;</string>
         <property name="text">
          <string>Memory</string>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeatInterval">
+         <number>300</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -714,6 +744,15 @@ border-radius: 16px;</string>
         </property>
         <property name="text">
          <string>Files</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeatInterval">
+         <number>300</number>
         </property>
        </widget>
       </item>
@@ -819,7 +858,7 @@ border-radius: 16px;</string>
       </item>
      </layout>
     </widget>
-    <widget class="QTableView" name="GeneralDataView">
+    <widget class="QTableWidget" name="GeneralDataView">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -929,33 +968,13 @@ border-radius: 16px;</string>
       </item>
      </layout>
     </widget>
-    <widget class="QTableView" name="ProcessDataViewA">
+    <widget class="QTableWidget" name="ProcessDataViewA">
      <property name="geometry">
       <rect>
        <x>20</x>
        <y>100</y>
        <width>451</width>
-       <height>61</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QTableView" name="ProcessDataViewB">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>190</y>
-       <width>451</width>
-       <height>61</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QTableView" name="ProcessDataViewC">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>290</y>
-       <width>451</width>
-       <height>61</height>
+       <height>261</height>
       </rect>
      </property>
     </widget>

@@ -2,6 +2,7 @@
 #define THREADMANAGER_H
 
 #include "MyObject.hpp"
+
 #include <QThread>
 #include <unordered_map>
 #include <string>
@@ -15,7 +16,7 @@ public:
     ThreadManager(QObject* parent = nullptr);
     ~ThreadManager();
 
-    void startNewThread(std::string id, MyObject* obj);
+    void startNewThread(MyObject* obj);
     void stopAll();
     void stopThread(std::string id);
 };

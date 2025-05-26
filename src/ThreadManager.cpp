@@ -1,4 +1,5 @@
 #include "include/ThreadManager.hpp"
+
 #include <iostream>
 
 ThreadManager::ThreadManager(QObject* parent) : QObject(parent){
@@ -9,8 +10,8 @@ ThreadManager::~ThreadManager() {
    stopAll();
 }
 
-void ThreadManager::startNewThread(std::string id, MyObject* obj){
-    std::cout << "Starting thread: " << id << std::endl;
+void ThreadManager::startNewThread(MyObject* obj){
+    std::cout << "Starting thread: " << obj->getMyName() << std::endl;
     QThread* thread = new QThread();
     obj->start();
     obj->moveToThread(thread);
@@ -18,7 +19,7 @@ void ThreadManager::startNewThread(std::string id, MyObject* obj){
     connect(thread, &QThread::finished, obj, &MyObject::stop);
     connect(thread, &QThread::finished, thread, &QObject::deleteLater);
     thread->start();
-    threads.insert(std::pair<std::string, QThread*>(id, thread));
+    threads.insert(std::pair<std::string, QThread*>(obj->getMyName(), thread));
 }
 
 void ThreadManager::stopAll(){

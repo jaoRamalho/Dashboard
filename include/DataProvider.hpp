@@ -3,8 +3,9 @@
 
 
 #include "MyObject.hpp"
-#include <vector>
 #include "ProcessInfo.h"
+
+#include <vector>
 #include <string>
 
 
@@ -19,10 +20,14 @@ public:
     static DataProvider* getInstance(QObject* parent = nullptr);
 
 public slots:
-    void loop() override;
+    void loop();
 
 signals:
-    void processListUpdated(const std::vector<ProcessInfo>&);
+    void processListUpdated(const std::vector<ProcessInfo*>&);
+    void cpuListUpdated(const std::vector<CPUInfo*>&);
+    void memoryListUpdated(const std::vector<MemoryInfo*>&);
+public:
+    const ProcessInfo* getProcessByPID(const std::string& pid) const;
 };
 
 #endif // DATAPROVIDER_HPP

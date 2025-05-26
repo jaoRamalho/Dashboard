@@ -1,7 +1,6 @@
 #include "include/mainwindow.h"
-#include "include/ThreadManager.hpp"
-#include "include/DataProvider.hpp"
-#include "include/SystemCall.hpp"
+#include "include/Dashboard.hpp"
+
 
 #include <QMetaType>
 #include <QApplication>
@@ -10,10 +9,12 @@
 
 #include <iostream>
 
-
 int main(int argc, char *argv[])
 {
-    qRegisterMetaType<std::vector<ProcessInfo>>("std::vector<ProcessInfo>");
+    qRegisterMetaType<std::vector<InfoBase*>>("std::vector<InfoBase*>");
+    qRegisterMetaType<std::vector<ProcessInfo*>>("std::vector<ProcessInfo*>");
+    qRegisterMetaType<std::vector<CPUInfo*>>("std::vector<CPUInfo*>");
+    qRegisterMetaType<std::vector<MemoryInfo*>>("std::vector<MemoryInfo*>");
     QApplication a(argc, argv);
 
     
@@ -26,20 +27,12 @@ int main(int argc, char *argv[])
             break;
         }
     }
-    ThreadManager* threadManager = new ThreadManager();
-    DataProvider* dataProvider = DataProvider::getInstance();
-    SystemCall* sysCall = SystemCall::getInstance();
     
-    threadManager->startNewThread("SystemCall", sysCall);
-    threadManager->startNewThread("DataProvider", dataProvider);
-
+    Dashboard* dashboard = new Dashboard();
+    dashboard->start();
     MainWindow w;
     w.show();
-    a.exec();
-
-    std::cout << "Stopping threads..." << std::endl;
-    dataProvider->stop();
-    sysCall->stop();
-    threadManager->stopAll();
-    return 0;
+    int r = a.exec();
+    dashboard->stop();
+    return r;
 }

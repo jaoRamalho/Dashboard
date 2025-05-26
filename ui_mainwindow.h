@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.15.15
+** Created by: Qt User Interface Compiler version 5.15.13
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -20,7 +20,6 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
-#include <QtWidgets/QTableView>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -40,23 +39,21 @@ public:
     QWidget *horizontalLayoutWidget;
     QHBoxLayout *horizontalLayout;
     QPushButton *ProcessButton;
-    QPushButton *ProcessButton_2;
-    QPushButton *ProcessButton_4;
-    QPushButton *ProcessButton_3;
+    QPushButton *PerformanceButton;
+    QPushButton *MemoryButton;
+    QPushButton *FilesButton;
     QFrame *frame_2;
     QWidget *horizontalLayoutWidget_2;
     QHBoxLayout *horizontalLayout_2;
     QFrame *FrameIconProcess_2;
     QLabel *generaltitle;
-    QTableView *GeneralDataView;
+    QTableWidget *GeneralDataView;
     QFrame *frame_3;
     QWidget *horizontalLayoutWidget_3;
     QHBoxLayout *horizontalLayout_3;
     QFrame *FrameIconProcess_3;
     QLabel *processname;
-    QTableView *ProcessDataViewA;
-    QTableView *ProcessDataViewB;
-    QTableView *ProcessDataViewC;
+    QTableWidget *ProcessDataViewA;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -103,66 +100,68 @@ public:
         QBrush brush(QColor(255, 255, 255, 255));
         brush.setStyle(Qt::SolidPattern);
         palette.setBrush(QPalette::Active, QPalette::WindowText, brush);
-        QBrush brush1(QColor(0, 0, 0, 255));
+        QBrush brush1(QColor(37, 37, 37, 255));
         brush1.setStyle(Qt::SolidPattern);
         palette.setBrush(QPalette::Active, QPalette::Button, brush1);
-        palette.setBrush(QPalette::Active, QPalette::Light, brush1);
-        palette.setBrush(QPalette::Active, QPalette::Midlight, brush1);
-        palette.setBrush(QPalette::Active, QPalette::Dark, brush1);
-        palette.setBrush(QPalette::Active, QPalette::Mid, brush1);
+        QBrush brush2(QColor(0, 0, 0, 255));
+        brush2.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::Light, brush2);
+        palette.setBrush(QPalette::Active, QPalette::Midlight, brush2);
+        palette.setBrush(QPalette::Active, QPalette::Dark, brush2);
+        palette.setBrush(QPalette::Active, QPalette::Mid, brush2);
         palette.setBrush(QPalette::Active, QPalette::Text, brush);
         palette.setBrush(QPalette::Active, QPalette::BrightText, brush);
         palette.setBrush(QPalette::Active, QPalette::ButtonText, brush);
         palette.setBrush(QPalette::Active, QPalette::Base, brush1);
         palette.setBrush(QPalette::Active, QPalette::Window, brush1);
-        palette.setBrush(QPalette::Active, QPalette::Shadow, brush1);
+        palette.setBrush(QPalette::Active, QPalette::Shadow, brush2);
         palette.setBrush(QPalette::Active, QPalette::AlternateBase, brush);
-        QBrush brush2(QColor(255, 255, 220, 255));
-        brush2.setStyle(Qt::SolidPattern);
-        palette.setBrush(QPalette::Active, QPalette::ToolTipBase, brush2);
-        QBrush brush3(QColor(36, 31, 49, 255));
+        QBrush brush3(QColor(255, 255, 220, 255));
         brush3.setStyle(Qt::SolidPattern);
-        palette.setBrush(QPalette::Active, QPalette::ToolTipText, brush3);
-        QBrush brush4(QColor(255, 255, 255, 128));
+        palette.setBrush(QPalette::Active, QPalette::ToolTipBase, brush3);
+        QBrush brush4(QColor(36, 31, 49, 255));
         brush4.setStyle(Qt::SolidPattern);
+        palette.setBrush(QPalette::Active, QPalette::ToolTipText, brush4);
+        QBrush brush5(QColor(255, 255, 255, 128));
+        brush5.setStyle(Qt::SolidPattern);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-        palette.setBrush(QPalette::Active, QPalette::PlaceholderText, brush4);
+        palette.setBrush(QPalette::Active, QPalette::PlaceholderText, brush5);
 #endif
         palette.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
         palette.setBrush(QPalette::Inactive, QPalette::Button, brush1);
-        palette.setBrush(QPalette::Inactive, QPalette::Light, brush1);
-        palette.setBrush(QPalette::Inactive, QPalette::Midlight, brush1);
-        palette.setBrush(QPalette::Inactive, QPalette::Dark, brush1);
-        palette.setBrush(QPalette::Inactive, QPalette::Mid, brush1);
+        palette.setBrush(QPalette::Inactive, QPalette::Light, brush2);
+        palette.setBrush(QPalette::Inactive, QPalette::Midlight, brush2);
+        palette.setBrush(QPalette::Inactive, QPalette::Dark, brush2);
+        palette.setBrush(QPalette::Inactive, QPalette::Mid, brush2);
         palette.setBrush(QPalette::Inactive, QPalette::Text, brush);
         palette.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
         palette.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
         palette.setBrush(QPalette::Inactive, QPalette::Base, brush1);
         palette.setBrush(QPalette::Inactive, QPalette::Window, brush1);
-        palette.setBrush(QPalette::Inactive, QPalette::Shadow, brush1);
+        palette.setBrush(QPalette::Inactive, QPalette::Shadow, brush2);
         palette.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush);
-        palette.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush2);
-        palette.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush3);
+        palette.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush3);
+        palette.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush4);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-        palette.setBrush(QPalette::Inactive, QPalette::PlaceholderText, brush4);
+        palette.setBrush(QPalette::Inactive, QPalette::PlaceholderText, brush5);
 #endif
-        palette.setBrush(QPalette::Disabled, QPalette::WindowText, brush1);
+        palette.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
         palette.setBrush(QPalette::Disabled, QPalette::Button, brush1);
-        palette.setBrush(QPalette::Disabled, QPalette::Light, brush1);
-        palette.setBrush(QPalette::Disabled, QPalette::Midlight, brush1);
-        palette.setBrush(QPalette::Disabled, QPalette::Dark, brush1);
-        palette.setBrush(QPalette::Disabled, QPalette::Mid, brush1);
-        palette.setBrush(QPalette::Disabled, QPalette::Text, brush1);
+        palette.setBrush(QPalette::Disabled, QPalette::Light, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::Midlight, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::Dark, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::Mid, brush2);
+        palette.setBrush(QPalette::Disabled, QPalette::Text, brush2);
         palette.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
-        palette.setBrush(QPalette::Disabled, QPalette::ButtonText, brush1);
+        palette.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
         palette.setBrush(QPalette::Disabled, QPalette::Base, brush1);
         palette.setBrush(QPalette::Disabled, QPalette::Window, brush1);
-        palette.setBrush(QPalette::Disabled, QPalette::Shadow, brush1);
+        palette.setBrush(QPalette::Disabled, QPalette::Shadow, brush2);
         palette.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush);
-        palette.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush2);
-        palette.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush3);
+        palette.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
+        palette.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush4);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-        palette.setBrush(QPalette::Disabled, QPalette::PlaceholderText, brush4);
+        palette.setBrush(QPalette::Disabled, QPalette::PlaceholderText, brush5);
 #endif
         processTable->setPalette(palette);
 
@@ -196,44 +195,57 @@ public:
         ProcessButton->setStyleSheet(QString::fromUtf8("background-color: #F15025;\n"
 "color : white;\n"
 "border-radius: 16px;"));
+        ProcessButton->setCheckable(true);
+        ProcessButton->setChecked(false);
+        ProcessButton->setAutoRepeat(false);
+        ProcessButton->setAutoRepeatInterval(300);
 
         horizontalLayout->addWidget(ProcessButton);
 
-        ProcessButton_2 = new QPushButton(horizontalLayoutWidget);
-        ProcessButton_2->setObjectName(QString::fromUtf8("ProcessButton_2"));
-        ProcessButton_2->setMinimumSize(QSize(160, 30));
-        ProcessButton_2->setMaximumSize(QSize(160, 30));
-        ProcessButton_2->setFont(font);
-        ProcessButton_2->setAutoFillBackground(false);
-        ProcessButton_2->setStyleSheet(QString::fromUtf8("background-color: #151515;\n"
+        PerformanceButton = new QPushButton(horizontalLayoutWidget);
+        PerformanceButton->setObjectName(QString::fromUtf8("PerformanceButton"));
+        PerformanceButton->setMinimumSize(QSize(160, 30));
+        PerformanceButton->setMaximumSize(QSize(160, 30));
+        PerformanceButton->setFont(font);
+        PerformanceButton->setAutoFillBackground(false);
+        PerformanceButton->setStyleSheet(QString::fromUtf8("background-color: #151515;\n"
 "color : white;\n"
 "border-radius: 16px;"));
+        PerformanceButton->setCheckable(true);
+        PerformanceButton->setChecked(false);
+        PerformanceButton->setAutoRepeatInterval(300);
 
-        horizontalLayout->addWidget(ProcessButton_2);
+        horizontalLayout->addWidget(PerformanceButton);
 
-        ProcessButton_4 = new QPushButton(horizontalLayoutWidget);
-        ProcessButton_4->setObjectName(QString::fromUtf8("ProcessButton_4"));
-        ProcessButton_4->setMinimumSize(QSize(0, 0));
-        ProcessButton_4->setMaximumSize(QSize(100, 30));
-        ProcessButton_4->setFont(font);
-        ProcessButton_4->setAutoFillBackground(false);
-        ProcessButton_4->setStyleSheet(QString::fromUtf8("background-color: #151515;\n"
+        MemoryButton = new QPushButton(horizontalLayoutWidget);
+        MemoryButton->setObjectName(QString::fromUtf8("MemoryButton"));
+        MemoryButton->setMinimumSize(QSize(0, 0));
+        MemoryButton->setMaximumSize(QSize(100, 30));
+        MemoryButton->setFont(font);
+        MemoryButton->setAutoFillBackground(false);
+        MemoryButton->setStyleSheet(QString::fromUtf8("background-color: #151515;\n"
 "color : white;\n"
 "border-radius: 16px;"));
+        MemoryButton->setCheckable(true);
+        MemoryButton->setChecked(false);
+        MemoryButton->setAutoRepeatInterval(300);
 
-        horizontalLayout->addWidget(ProcessButton_4);
+        horizontalLayout->addWidget(MemoryButton);
 
-        ProcessButton_3 = new QPushButton(horizontalLayoutWidget);
-        ProcessButton_3->setObjectName(QString::fromUtf8("ProcessButton_3"));
-        ProcessButton_3->setMinimumSize(QSize(0, 0));
-        ProcessButton_3->setMaximumSize(QSize(100, 30));
-        ProcessButton_3->setFont(font);
-        ProcessButton_3->setAutoFillBackground(false);
-        ProcessButton_3->setStyleSheet(QString::fromUtf8("background-color: #151515;\n"
+        FilesButton = new QPushButton(horizontalLayoutWidget);
+        FilesButton->setObjectName(QString::fromUtf8("FilesButton"));
+        FilesButton->setMinimumSize(QSize(0, 0));
+        FilesButton->setMaximumSize(QSize(100, 30));
+        FilesButton->setFont(font);
+        FilesButton->setAutoFillBackground(false);
+        FilesButton->setStyleSheet(QString::fromUtf8("background-color: #151515;\n"
 "color : white;\n"
 "border-radius: 16px;"));
+        FilesButton->setCheckable(true);
+        FilesButton->setChecked(false);
+        FilesButton->setAutoRepeatInterval(300);
 
-        horizontalLayout->addWidget(ProcessButton_3);
+        horizontalLayout->addWidget(FilesButton);
 
         frame_2 = new QFrame(centralwidget);
         frame_2->setObjectName(QString::fromUtf8("frame_2"));
@@ -280,7 +292,7 @@ public:
 
         horizontalLayout_2->addWidget(generaltitle);
 
-        GeneralDataView = new QTableView(frame_2);
+        GeneralDataView = new QTableWidget(frame_2);
         GeneralDataView->setObjectName(QString::fromUtf8("GeneralDataView"));
         GeneralDataView->setGeometry(QRect(20, 100, 451, 61));
         frame_3 = new QFrame(centralwidget);
@@ -320,15 +332,9 @@ public:
 
         horizontalLayout_3->addWidget(processname);
 
-        ProcessDataViewA = new QTableView(frame_3);
+        ProcessDataViewA = new QTableWidget(frame_3);
         ProcessDataViewA->setObjectName(QString::fromUtf8("ProcessDataViewA"));
-        ProcessDataViewA->setGeometry(QRect(20, 100, 451, 61));
-        ProcessDataViewB = new QTableView(frame_3);
-        ProcessDataViewB->setObjectName(QString::fromUtf8("ProcessDataViewB"));
-        ProcessDataViewB->setGeometry(QRect(20, 190, 451, 61));
-        ProcessDataViewC = new QTableView(frame_3);
-        ProcessDataViewC->setObjectName(QString::fromUtf8("ProcessDataViewC"));
-        ProcessDataViewC->setGeometry(QRect(30, 290, 451, 61));
+        ProcessDataViewA->setGeometry(QRect(20, 100, 451, 261));
         MainWindow->setCentralWidget(centralwidget);
         frame_2->raise();
         frame_4->raise();
@@ -352,9 +358,9 @@ public:
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         processSearchEdit->setText(QString());
         ProcessButton->setText(QCoreApplication::translate("MainWindow", "Process", nullptr));
-        ProcessButton_2->setText(QCoreApplication::translate("MainWindow", "Performance", nullptr));
-        ProcessButton_4->setText(QCoreApplication::translate("MainWindow", "Memory", nullptr));
-        ProcessButton_3->setText(QCoreApplication::translate("MainWindow", "Files", nullptr));
+        PerformanceButton->setText(QCoreApplication::translate("MainWindow", "Performance", nullptr));
+        MemoryButton->setText(QCoreApplication::translate("MainWindow", "Memory", nullptr));
+        FilesButton->setText(QCoreApplication::translate("MainWindow", "Files", nullptr));
         generaltitle->setText(QCoreApplication::translate("MainWindow", "General data ", nullptr));
         processname->setText(QCoreApplication::translate("MainWindow", "Process data", nullptr));
     } // retranslateUi
