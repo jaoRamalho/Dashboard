@@ -35,6 +35,8 @@ struct ProcessInfo : public InfoBase {
     unsigned long swichContextInvoluntary;
     unsigned long swichContextVoluntary;
     std::string state;
+    unsigned long stackSize;
+    unsigned long heapSize;
 };
 
 /// Informacao de CPU

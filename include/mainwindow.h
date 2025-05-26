@@ -22,6 +22,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     std::mutex processMutex; 
+    bool update = false; // Flag para verificar se a linha da tabela foi clicada
     
 
 private slots:

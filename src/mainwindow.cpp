@@ -29,7 +29,7 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::onProcessTableRowClicked(int row) {
-    if (row < 0 || row >= ui->processTable->rowCount()) {
+    if (row < 0 || row >= ui->processTable->rowCount() || !update) {
         return; // Verifica se a linha é válida
     }
 
@@ -84,6 +84,17 @@ void MainWindow::onProcessTableRowClicked(int row) {
     }
 }
 
+void clearTableWidget(QTableWidget* table) {
+    for (int row = 0; row < table->rowCount(); ++row) {
+        for (int col = 0; col < table->columnCount(); ++col) {
+            QTableWidgetItem* item = table->takeItem(row, col);
+            delete item; // Libera a memória do item
+            item = nullptr; // Define o ponteiro como nulo
+        }
+    }
+    table->clearContents(); // Limpa o conteúdo da tabela
+}
+
 void MainWindow::onClickedButtonProcess() {
     ui->ProcessDataViewA->clear();
     ui->ProcessButton->setChecked(true);
@@ -120,9 +131,11 @@ void MainWindow::onClickedButtonFiles() {
 
    
 void MainWindow::updateGeneralDataProcess(const std::vector<ProcessInfo*> list) {
-    if (list.empty() || !ui->ProcessButton->isChecked()) {
+    if (list.empty() || !ui->ProcessButton->isChecked() ) {
         return; // Se a lista estiver vazia, não faz nada
     }
+
+    update = false; // Reseta a flag de atualização
 
     int qtdTotalProcessos = list.size();
     
@@ -136,6 +149,7 @@ void MainWindow::updateGeneralDataProcess(const std::vector<ProcessInfo*> list) 
         totalMemory += process->memory; // Soma a memória de cada processo
     }
 
+    clearTableWidget(ui->GeneralDataView); // Limpa a tabela antes de adicionar novos dados
     ui->GeneralDataView->clearContents();
     ui->GeneralDataView->clear(); // Limpa a tabela antes de adicionar novos dados
     ui->GeneralDataView->setRowCount(1);
@@ -160,13 +174,16 @@ void MainWindow::onProcessListUpdated(const std::vector<ProcessInfo*> list) {
         return; 
     } 
     
+    clearTableWidget(ui->processTable); // Limpa a tabela antes de adicionar novos dados
     ui->processTable->clearContents();
     ui->processTable->clear();
     ui->processTable->setRowCount(list.size());
     updateGeneralDataProcess(list); // Atualiza os dados gerais dos processos
     
-    ui->processTable->setColumnCount(8); // Exemplo: PID, Nome, Usuário, Memória
-    QStringList headers = {"PID", "Nome", "Usuário", "Memória(KB)", "N Threads", "Switch Context Involuntary", "Switch Context Voluntary", "State"};
+    update = true;
+
+    ui->processTable->setColumnCount(10); // Exemplo: PID, Nome, Usuário, Memória
+    QStringList headers = {"PID", "Nome", "Usuário", "Memória(KB)", "N Threads", "Switch Context Involuntary", "Switch Context Voluntary", "State", "Stack Size (KB)", "Heap Size (KB)"};
     ui->processTable->setHorizontalHeaderLabels(headers);
 
     for (size_t row = 0; row < list.size(); ++row) { // Alterado int para size_t
@@ -179,6 +196,8 @@ void MainWindow::onProcessListUpdated(const std::vector<ProcessInfo*> list) {
         ui->processTable->setItem(row, 5, new QTableWidgetItem(QString::number(p->swichContextInvoluntary)));
         ui->processTable->setItem(row, 6, new QTableWidgetItem(QString::number(p->swichContextVoluntary)));
         ui->processTable->setItem(row, 7, new QTableWidgetItem(QString::fromStdString(p->state)));
+        ui->processTable->setItem(row, 8, new QTableWidgetItem(QString::number(p->stackSize))); // Tamanho da pilha
+        ui->processTable->setItem(row, 9, new QTableWidgetItem(QString::number(p->heapSize))); // Tamanho do heap
     }   
 }
 
@@ -186,8 +205,6 @@ void MainWindow::updateGeneralDataCPU(const std::vector<CPUInfo*> list) {
     if (list.empty() || !ui->PerformanceButton->isChecked()) {
         return; // Se a lista estiver vazia, não faz nada
     }
-
-
 }
 
 void MainWindow::onMemoryListUpdated(const std::vector<MemoryInfo*> list) {
@@ -209,6 +226,7 @@ void MainWindow::onMemoryListUpdated(const std::vector<MemoryInfo*> list) {
         cached += mem->cached;
     }
 
+    clearTableWidget(ui->ProcessDataViewA); // Limpa a tabela antes de adicionar novos dados
     ui->GeneralDataView->clearContents();
     ui->ProcessDataViewA->clear();
     ui->ProcessDataViewA->setRowCount(1);
@@ -221,7 +239,6 @@ void MainWindow::onMemoryListUpdated(const std::vector<MemoryInfo*> list) {
     ui->ProcessDataViewA->setItem(0, 2, new QTableWidgetItem(QString::number(usedMemory / 1024)));
     ui->ProcessDataViewA->setItem(0, 3, new QTableWidgetItem(QString::number(buffers / 1024)));
     ui->ProcessDataViewA->setItem(0, 4, new QTableWidgetItem(QString::number(cached / 1024)));
-
 }
 
 void MainWindow::onCPUListUpdated(const std::vector<CPUInfo*> list) {
@@ -229,6 +246,7 @@ void MainWindow::onCPUListUpdated(const std::vector<CPUInfo*> list) {
         return; // Se a lista estiver vazia, não faz nada
     }
 
+    clearTableWidget(ui->ProcessDataViewA); // Limpa a tabela antes de adicionar novos dados
     ui->ProcessDataViewA->clearContents();
     ui->ProcessDataViewA->clear();
     ui->ProcessDataViewA->setRowCount(list.size());

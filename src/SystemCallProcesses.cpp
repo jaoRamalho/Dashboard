@@ -83,6 +83,14 @@ void SystemCallProcesses::updateProcesses() {
                         std::istringstream iss(line.substr(26));
                         iss >> info->swichContextInvoluntary;
                     }
+                    if (line.rfind("VmData:", 0) == 0) {
+                        std::istringstream iss(line.substr(7));
+                        iss >> info->heapSize;
+                    }
+                    if (line.rfind("VmStk:", 0) == 0) {
+                        std::istringstream iss(line.substr(7));
+                        iss >> info->stackSize;
+                    }
                 }
 
                 // Ler threads

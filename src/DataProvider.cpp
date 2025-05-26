@@ -32,36 +32,44 @@ void DataProvider::loop() {
         SystemCallMemory* sysCallMemory = SystemCallMemory::getInstance();
         SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
 
+
         std::vector<ProcessInfo*> processList;
         std::vector<CPUInfo*> cpuList;
         std::vector<MemoryInfo*> memoryList;
 
-        if(sysCallProcesses->isAccessible()) {
-            for (auto& base : sysCallProcesses->getInfo()) {
-                ProcessInfo* p = dynamic_cast<ProcessInfo*>(base);
-                if (p) processList.push_back(p);
+        if (sysCallProcesses != nullptr){
+            if(sysCallProcesses->isAccessible()) {
+                for (auto& base : sysCallProcesses->getInfo()) {
+                    ProcessInfo* p = dynamic_cast<ProcessInfo*>(base);
+                    if (p) processList.push_back(p);
+                }
+                if (processList.size() > 0)
+                    emit processListUpdated(processList);
             }
-            if (processList.size() > 0)
-                emit processListUpdated(processList);
         }
     
 
-        if (sysCallMemory->isAccessible()){
-            for (auto& base : sysCallMemory->getInfo()) {
-                MemoryInfo* m = dynamic_cast<MemoryInfo*>(base);
-                if (m) memoryList.push_back(m);
+        if(sysCallMemory != nullptr){
+            if (sysCallMemory->isAccessible()){
+                for (auto& base : sysCallMemory->getInfo()) {
+                    MemoryInfo* m = dynamic_cast<MemoryInfo*>(base);
+                    if (m) memoryList.push_back(m);
+                }
+                if (memoryList.size() > 0)
+                    emit memoryListUpdated(memoryList);
             }
-            if (memoryList.size() > 0)
-                emit memoryListUpdated(memoryList);
         }
 
-        if (sysCallCPU->isAccessible()){
-            for (auto& base : sysCallCPU->getInfo()) {
-                CPUInfo* c = dynamic_cast<CPUInfo*>(base);
-                if (c) cpuList.push_back(c);
+
+        if (sysCallCPU != nullptr){
+            if (sysCallCPU->isAccessible()){
+                for (auto& base : sysCallCPU->getInfo()) {
+                    CPUInfo* c = dynamic_cast<CPUInfo*>(base);
+                    if (c) cpuList.push_back(c);
+                }
+                if (memoryList.size() > 0)
+                    emit cpuListUpdated(cpuList);
             }
-            if (memoryList.size() > 0)
-                emit cpuListUpdated(cpuList);
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));

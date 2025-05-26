@@ -74,13 +74,9 @@ void SystemCallCPU::updateCPU() {
 
             }
         }
-
-
-        
-    
+ 
         // Salva o último CPUInfo lido
-        if (info) {
-    
+        if (info) {    
             this->info.push_back(info);
         }
     }
