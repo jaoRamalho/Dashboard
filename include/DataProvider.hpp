@@ -20,7 +20,7 @@ public:
 
 public slots:
     void loop() override;
-
+// Sinal é uma estrutura do qt, todo sinal é amarrado com uma função, quando um sinal é emitido a função é chamada.
 signals:
     void processListUpdated(const std::vector<ProcessInfo>&);
 };
