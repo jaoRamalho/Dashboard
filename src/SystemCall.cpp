@@ -79,13 +79,22 @@ void SystemCall::updateProcesses() {
                 try {
                     for (const auto& threadEntry : fs::directory_iterator(taskPath)) {
                         std::string tid = threadEntry.path().filename().string();
-                        info.threadsID.push_back(tid);
+                        if (tid.empty()){
+                            cout<< "Erro: TID vazio encontrado no processo " << info.pid << std::endl;
+                        }
+                        else{
+                            info.threadsID.push_back(tid);
+                        }
                     }
                     info.n_threads = static_cast<uint16_t>(info.threadsID.size());
                 } catch (const std::filesystem::filesystem_error& e) {
-                    // O processo pode ter terminado, ignore o erro
+                    // mostrar detalhes de erros.
+                    std::cerr << "Erro ao acessar threads do processo " << info.pid << ":\n"
+                            << "Código do erro: " << e.code() << "\n"
+                            << "Descrição: " << e.what() << "\n"
+                            << "Caminho 1: " << e.path1() << "\n"
+                            << "Caminho 2: " << e.path2() << std::endl;
                 }
-
                 processes.push_back(info);
             }
         }

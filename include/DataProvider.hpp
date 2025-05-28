@@ -7,7 +7,8 @@
 #include "ProcessInfo.h"
 #include <string>
 
-
+// data provider é resposável por ordenar a busca de dados pelo system calls, em seguida notifica a inteface de novos dados
+// que devem ser mostrados na tela
 class DataProvider : public MyObject{
     Q_OBJECT
 private:

@@ -13,10 +13,12 @@
 
 int main(int argc, char *argv[])
 {
+    //Cria vetor de objetos para troca de sinais
     qRegisterMetaType<std::vector<ProcessInfo>>("std::vector<ProcessInfo>");
+    // QAplication é o objeto base para usar o qt
     QApplication a(argc, argv);
 
-    
+    // Utiliza o dicionário local do computador para fazer a tradução.
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
     for (const QString &locale : uiLanguages) {

@@ -19,6 +19,8 @@ DataProvider* DataProvider::getInstance(QObject* parent) {
 }
 
 void DataProvider::loop(){
+    // ideia: não atualizar toda a lista, e sim pegar o processo pelo id e atualizar seus parâmetros.
+    //talvez isso norteie onde esta o erro de segmentation fault
     while(isRunning){
         std::cout << "DataProvider loop" << std::endl;
         SystemCall* sysCall = SystemCall::getInstance();

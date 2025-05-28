@@ -8,7 +8,7 @@ ThreadManager::ThreadManager(QObject* parent) : QObject(parent){
 ThreadManager::~ThreadManager() {
    stopAll();
 }
-
+// cria a thread para os fluxos de chamada de sistema e para o DataProvider
 void ThreadManager::startNewThread(std::string id, MyObject* obj){
     std::cout << "Starting thread: " << id << std::endl;
     QThread* thread = new QThread();
