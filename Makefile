@@ -522,7 +522,9 @@ mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
 		include/ProcessInfo.h \
 		ui_mainwindow.h \
 		include/DataProvider.hpp \
-		include/MyObject.hpp
+		include/MyObject.hpp \
+		include/SystemCallProcesses.hpp \
+		include/SystemCall.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o src/mainwindow.cpp
 
 ThreadManager.o: src/ThreadManager.cpp include/ThreadManager.hpp \
