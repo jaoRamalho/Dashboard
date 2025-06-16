@@ -89,7 +89,7 @@ void SystemCallCPU::updateCPU() {
 
 void SystemCallCPU::loop() {
     while (isRunning) {
-        std::cout << "SystemCallCPU loop" << std::endl;
+        //std::cout << "SystemCallCPU loop" << std::endl;
         acessible = false;
         updateCPU();
         acessible = true;

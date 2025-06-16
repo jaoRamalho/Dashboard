@@ -59,7 +59,7 @@ void SystemCallMemory::updateMemory() {
 
 void SystemCallMemory::loop() {
     while (isRunning) {
-        std::cout << "SystemCallMemory loop" << std::endl;
+        //std::cout << "SystemCallMemory loop" << std::endl;
         acessible = false;
         updateMemory();
         acessible = true;

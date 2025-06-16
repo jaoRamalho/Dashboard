@@ -2,6 +2,7 @@
 #include "include/SystemCallProcesses.hpp"
 #include "include/SystemCallMemory.hpp"
 #include "include/SystemCallCPU.hpp"
+#include "include/SystemCallDisk.hpp"
 
 #include <thread>
 
@@ -9,7 +10,7 @@ DataProvider* DataProvider::instance = nullptr;
 DataProvider::DataProvider(QObject *parent) : MyObject(parent){
     nameMyObject = "DataProvider";
     isRunning = false;
-    delay = 300;
+    delay = 1000;
 }
 
 DataProvider::~DataProvider(){
@@ -28,14 +29,16 @@ DataProvider* DataProvider::getInstance(QObject* parent) {
 
 void DataProvider::loop() {
     while (isRunning) {
-        std::cout << "DataProvider loop" << std::endl;
+        //std::cout << "DataProvider loop" << std::endl;
         SystemCallCPU* sysCallCPU = SystemCallCPU::getInstance();
         SystemCallMemory* sysCallMemory = SystemCallMemory::getInstance();
         SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
+        SystemCallDisk* sysCallDisk = SystemCallDisk::getInstance();
 
         std::vector<ProcessInfo*> processList;
         std::vector<CPUInfo*> cpuList;
         std::vector<MemoryInfo*> memoryList;
+        std::vector<PartitionInfo*> diskList;
 
         if(sysCallProcesses->isAccessible()) {
             for (auto& base : sysCallProcesses->getInfo()) {
@@ -65,6 +68,14 @@ void DataProvider::loop() {
                 emit cpuListUpdated(cpuList);
         }
 
+        if (sysCallDisk->isAccessible()) {
+            for (auto& base : sysCallDisk->getInfo()) {
+                PartitionInfo* d = dynamic_cast<PartitionInfo*>(base);
+                if (d) {
+                    diskList.push_back(d);
+                }
+            }
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     }
 }

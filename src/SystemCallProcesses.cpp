@@ -141,7 +141,7 @@ TreadsInfo SystemCallProcesses::getThreadInfo(std::string pid, std::string tid){
 
 void SystemCallProcesses::loop() {
     while (isRunning) {
-        std::cout << "SystemCallProcesses loop" << std::endl;
+        //std::cout << "SystemCallProcesses loop" << std::endl;
         acessible = false;
         updateProcesses();
         acessible = true;        

@@ -18,6 +18,7 @@ SOURCES += \
     src/SystemCallCPU.cpp \
     src/SystemCallMemory.cpp \
     src/SystemCallProcesses.cpp \
+    src/SystemCallDisk.cpp \
     src/Dashboard.cpp
 
 HEADERS += \
@@ -30,6 +31,7 @@ HEADERS += \
     include/SystemCallCPU.hpp \ 
     include/SystemCallMemory.hpp \
     include/SystemCallProcesses.hpp \
+    include/SystemCallDIsk.hpp \
     include/Dashboard.hpp
 
 FORMS += \

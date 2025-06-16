@@ -6,6 +6,7 @@ Dashboard::Dashboard() {
     sysCallMemory = SystemCallMemory::getInstance();
     sysCallProcesses = SystemCallProcesses::getInstance();
     sysCallCPU = SystemCallCPU::getInstance();
+    // sysCallDisk = SystemCallDisk::getInstance();
     dataProvider = DataProvider::getInstance();
 }
 
@@ -18,6 +19,7 @@ void Dashboard::start() {
     threadManager->startNewThread(sysCallProcesses);
     threadManager->startNewThread(sysCallCPU);
     threadManager->startNewThread(dataProvider);
+    threadManager->startNewThread(sysCallDisk);
 }
 
 void Dashboard::stop() {
@@ -26,4 +28,5 @@ void Dashboard::stop() {
     sysCallProcesses->stop();
     dataProvider->stop();
     threadManager->stopAll();
+    sysCallDisk->stop();
 }

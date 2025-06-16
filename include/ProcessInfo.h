@@ -11,6 +11,17 @@ struct InfoBase {
     virtual ~InfoBase() = default; 
 };
 
+// Estrutura para armazenar as informações de cada partição
+struct PartitionInfo : public InfoBase  {
+    std::string device;
+    std::string mountPoint;
+    std::string fsType;
+    unsigned long long totalSpaceGB = 0;
+    unsigned long long usedSpaceGB = 0;
+    unsigned long long freeSpaceGB = 0;
+    double usagePercent = 0.0;
+};
+
 // Structs de Informacao
 /// Informacao de Threads
 struct TreadsInfo : public InfoBase {

@@ -11,7 +11,7 @@ SystemCall::SystemCall(QObject* parent) : MyObject(parent){
 }
 
 SystemCall::~SystemCall(){
-    std::cout << "SystemCall destructor called" << std::endl;
+    //std::cout << "SystemCall destructor called" << std::endl;
     isRunning = false; // Ensure the loops stop
 }
 
