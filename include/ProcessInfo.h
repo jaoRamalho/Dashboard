@@ -58,4 +58,17 @@ struct MemoryInfo : public InfoBase {
 };
 
 
+/// Informacao de Particao do Sistema de Arquivos
+struct PartitionInfo : public InfoBase {
+    std::string device;            // Nome do dispositivo, ex: /dev/sda1
+    std::string mountPoint;        // Ponto de montagem, ex: /
+    std::string filesystemType;    // Tipo de sistema de arquivos, ex: ext4
+    unsigned long totalSize;       // Tamanho total da partição em bytes
+    unsigned long usedSize;        // Espaço usado em bytes
+    unsigned long availableSize;   // Espaço disponível em bytes
+    float usagePercentage;         // Porcentagem de uso
+    bool isMounted;                // Se está montada ou não
+};
+
+
 #endif // PROCESSINFO_H
