@@ -588,7 +588,7 @@ Dashboard.o: src/Dashboard.cpp include/Dashboard.hpp \
 		include/SystemCallCPU.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Dashboard.o src/Dashboard.cpp
 
-MyMutex.o: src/MyMutex.cpp 
+MyMutex.o: src/MyMutex.cpp include/MyMutex.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MyMutex.o src/MyMutex.cpp
 
 qrc_qmake_qmake_qm_files.o: qrc_qmake_qmake_qm_files.cpp 

@@ -12,9 +12,9 @@
 int main(int argc, char *argv[])
 {
     qRegisterMetaType<std::vector<InfoBase*>>("std::vector<InfoBase*>");
-    qRegisterMetaType<std::vector<ProcessInfo*>>("std::vector<ProcessInfo*>");
-    qRegisterMetaType<std::vector<CPUInfo*>>("std::vector<CPUInfo*>");
-    qRegisterMetaType<std::vector<MemoryInfo*>>("std::vector<MemoryInfo*>");
+    qRegisterMetaType<std::vector<ProcessInfo>>("std::vector<ProcessInfo>");
+    qRegisterMetaType<std::vector<CPUInfo>>("std::vector<CPUInfo>");
+    qRegisterMetaType<std::vector<MemoryInfo>>("std::vector<MemoryInfo>");
     QApplication a(argc, argv);
 
     
@@ -34,5 +34,8 @@ int main(int argc, char *argv[])
     w.show();
     int r = a.exec();
     dashboard->stop();
+
+    delete dashboard; // Libera a memória alocada
+    
     return r;
 }

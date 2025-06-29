@@ -32,45 +32,43 @@ void DataProvider::loop() {
         SystemCallMemory* sysCallMemory = SystemCallMemory::getInstance();
         SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
 
-
-        std::vector<ProcessInfo*> processList;
-        std::vector<CPUInfo*> cpuList;
-        std::vector<MemoryInfo*> memoryList;
+        std::vector<ProcessInfo> processList;
+        std::vector<CPUInfo> cpuList;
+        std::vector<MemoryInfo> memoryList;
 
         if (sysCallProcesses != nullptr){
             std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
             if(sysCallProcesses->isAccessible()) {
-                for (auto& base : sysCallProcesses->getInfo()) {
+                std::vector<InfoBase*> baseCopy = sysCallProcesses->getInfo();
+                for (auto& base : baseCopy) {
                     ProcessInfo* p = dynamic_cast<ProcessInfo*>(base);
-                    if (p) processList.push_back(p);
+                    if (p) processList.push_back(*p); // Copia o objeto
                 }
-                if (processList.size() > 0)
+                if (!processList.empty())
                     emit processListUpdated(processList);
             }
         }
-    
 
         if(sysCallMemory != nullptr){
             std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de memória
             if (sysCallMemory->isAccessible()){
                 for (auto& base : sysCallMemory->getInfo()) {
                     MemoryInfo* m = dynamic_cast<MemoryInfo*>(base);
-                    if (m) memoryList.push_back(m);
+                    if (m) memoryList.push_back(*m); // Copia o objeto
                 }
-                if (memoryList.size() > 0)
+                if (!memoryList.empty())
                     emit memoryListUpdated(memoryList);
             }
         }
-
 
         if (sysCallCPU != nullptr){
             std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de CPU
             if (sysCallCPU->isAccessible()){
                 for (auto& base : sysCallCPU->getInfo()) {
                     CPUInfo* c = dynamic_cast<CPUInfo*>(base);
-                    if (c) cpuList.push_back(c);
+                    if (c) cpuList.push_back(*c); // Copia o objeto
                 }
-                if (memoryList.size() > 0)
+                if (!cpuList.empty())
                     emit cpuListUpdated(cpuList);
             }
         }
@@ -79,15 +77,16 @@ void DataProvider::loop() {
     }
 }
 
-const ProcessInfo* DataProvider::getProcessByPID(const std::string& pid) const {
+// Corrigido: retorna objeto por valor, não ponteiro
+const std::optional<ProcessInfo> DataProvider::getProcessByPID(const std::string& pid) const {
     SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
-    if (!sysCallProcesses->isAccessible()) return nullptr;
+    if (!sysCallProcesses || !sysCallProcesses->isAccessible()) return std::nullopt;
 
     for (auto& base : sysCallProcesses->getInfo()) {
         ProcessInfo* process = dynamic_cast<ProcessInfo*>(base);
         if (process && process->pid == pid) {
-            return process;
+            return *process; // Retorna uma cópia
         }
     }
-    return nullptr;
+    return std::nullopt;
 }

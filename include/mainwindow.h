@@ -25,12 +25,12 @@ public:
     
 
 private slots:
-    void onProcessListUpdated(const std::vector<ProcessInfo*>);
-    void onMemoryListUpdated(const std::vector<MemoryInfo*>);
-    void onCPUListUpdated(const std::vector<CPUInfo*>);
-    void updateGeneralDataProcess(const std::vector<ProcessInfo*>);
-    void updateGeneralDataMemory(const std::vector<MemoryInfo*>);
-    void updateGeneralDataCPU(const std::vector<CPUInfo*>);
+    void onProcessListUpdated(const std::vector<ProcessInfo>);
+    void onMemoryListUpdated(const std::vector<MemoryInfo>);
+    void onCPUListUpdated(const std::vector<CPUInfo>);
+    void updateGeneralDataProcess(const std::vector<ProcessInfo>);
+    void updateGeneralDataMemory(const std::vector<MemoryInfo>);
+    void updateGeneralDataCPU(const std::vector<CPUInfo>);
 
     void onClickedButtonProcess();
     void onClickedButtonMemory();

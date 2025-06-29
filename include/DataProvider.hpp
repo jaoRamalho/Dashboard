@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <string>
+#include <optional>
 
 
 class DataProvider : public MyObject{
@@ -23,11 +24,11 @@ public slots:
     void loop();
 
 signals:
-    void processListUpdated(const std::vector<ProcessInfo*>&);
-    void cpuListUpdated(const std::vector<CPUInfo*>&);
-    void memoryListUpdated(const std::vector<MemoryInfo*>&);
+    void processListUpdated(const std::vector<ProcessInfo>);
+    void cpuListUpdated(const std::vector<CPUInfo>);
+    void memoryListUpdated(const std::vector<MemoryInfo>);
 public:
-    const ProcessInfo* getProcessByPID(const std::string& pid) const;
+    const std::optional<ProcessInfo> getProcessByPID(const std::string& pid) const;
 };
 
 #endif // DATAPROVIDER_HPP
