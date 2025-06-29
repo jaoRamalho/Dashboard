@@ -10,6 +10,8 @@
 #include "SystemCallProcesses.hpp"
 #include "SystemCallMemory.hpp"
 #include "SystemCallCPU.hpp"
+#include "SystemCallDisk.hpp"
+#include "SystemCallFiles.hpp"
 
 
 class Dashboard {
@@ -18,7 +20,10 @@ private:
     SystemCallMemory* sysCallMemory;
     SystemCallProcesses* sysCallProcesses;
     SystemCallCPU* sysCallCPU;
+    SystemCallDisk* sysCallDisk;
+    SystemCallFiles* sysCallFiles;
     DataProvider* dataProvider;
+
 
 public:
     Dashboard();

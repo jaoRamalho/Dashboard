@@ -71,4 +71,15 @@ struct PartitionInfo : public InfoBase {
 };
 
 
+struct FileSystemNode : public InfoBase {
+    std::string name;                  // Nome do arquivo ou diretório
+    std::string fullPath;              // Caminho absoluto
+    bool isDirectory = false;          // Se é diretório
+    bool isSymlink = false;            // Se é link simbólico
+    unsigned long size = 0;            // Tamanho em bytes (apenas para arquivos)
+    std::string owner;                 // Nome do dono
+    std::string permissions;           // Permissões (ex: rwxr-xr-x)
+    std::vector<FileSystemNode> children; // Filhos (caso seja diretório)
+};
+
 #endif // PROCESSINFO_H

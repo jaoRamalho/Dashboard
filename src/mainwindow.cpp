@@ -8,21 +8,125 @@
 #include <iostream>
 #include <QLineEdit>
 
+#include <QDesktopServices>
+#include <QUrl>
+#include <QDebug>
+#include "include/SystemCallDisk.hpp"
+
+
+
+
+
+QStandardItemModel* fileTreeModel = nullptr;
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // Conexões dos botões e sinais
     connect(DataProvider::getInstance(), &DataProvider::processListUpdated, this, &MainWindow::onProcessListUpdated);
     connect(DataProvider::getInstance(), &DataProvider::cpuListUpdated, this, &MainWindow::onCPUListUpdated);
     connect(DataProvider::getInstance(), &DataProvider::memoryListUpdated, this, &MainWindow::onMemoryListUpdated);
+    connect(DataProvider::getInstance(), &DataProvider::diskListUpdated, this, &MainWindow::onDiskListUpdated);
+    connect(ui->PartitionsButton, &QPushButton::clicked, this, &MainWindow::onClickedButtonPartitions);
     connect(ui->ProcessButton, &QPushButton::clicked, this, &MainWindow::onClickedButtonProcess);
     connect(ui->PerformanceButton, &QPushButton::clicked, this, &MainWindow::onClickedButtonPerformace);
     connect(ui->MemoryButton, &QPushButton::clicked, this, &MainWindow::onClickedButtonMemory);
     connect(ui->FilesButton, &QPushButton::clicked, this, &MainWindow::onClickedButtonFiles);
     connect(ui->processTable, &QTableWidget::cellClicked, this, &MainWindow::onProcessTableRowClicked);
+    connect(ui->ButtonA, &QPushButton::clicked, this, &MainWindow::onClikedButtonA);
+    connect(ui->ButtonB, &QPushButton::clicked, this, &MainWindow::onClikedButtonB);
+    connect(ui->ButtonC, &QPushButton::clicked, this, &MainWindow::onClikedButtonC);
+    // === Inicializa TreeView de Arquivos ===
+    fileTreeView = new QTreeView(this);
+    fileSystemModel = new QFileSystemModel(this);
+    fileSystemModel->setRootPath(QDir::rootPath());
+    fileTreeView->setModel(fileSystemModel);
+    fileTreeView->setRootIndex(fileSystemModel->index(QDir::rootPath()));
+
+    ui->stackedWidgetMain->setCurrentIndex(0); // inicia com a página de tabela de processos
+    
+    // Adiciona a árvore de arquivos ao layout do frame
+    if (ui->frameContent->layout()) {
+        ui->frameContent->layout()->addWidget(fileTreeView);
+    }
+
+    // Conexão para clique na árvore
+    connect(fileTreeView, &QTreeView::clicked, this, [=](const QModelIndex &index) {
+        QString path = fileSystemModel->filePath(index);
+        qDebug() << "Arquivo ou diretório clicado:" << path;
+        // Aqui você pode fazer algo como abrir uma nova visualização, etc.
+    });
+    
+    if (!ui->frameContent->layout()) {
+        QVBoxLayout* layout = new QVBoxLayout(ui->frameContent);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(0);
+        ui->frameContent->setLayout(layout);
+    }
+
+    ui->frameContent->layout()->addWidget(fileTreeView);
 }
+void MainWindow::onClikedButtonA() {
+    ui->ProcessDataViewA->clear();
+    ui->ButtonA->setChecked(true);
+    ui->ButtonB->setChecked(false);
+    ui->ButtonC->setChecked(false);
+    ui->stackedWidgetMaster->setCurrentIndex(0);
+    setActiveButton(ui->ButtonA);
+}
+void MainWindow::onClikedButtonB() {
+    ui->ProcessDataViewA->clear();
+    ui->ButtonB->setChecked(true);
+    ui->ButtonA->setChecked(false);
+    ui->ButtonC->setChecked(false);
+    ui->stackedWidgetMaster->setCurrentIndex(1);
+    setActiveButton(ui->ButtonB);
+    // Solicita atualização das partições ao clicar no Botão B, se estiver na aba Files
+    if (ui->FilesButton->isChecked()) {
+        SystemCallDisk::getInstance()->updateDiskPartitions(); // Atualiza as partições
+        const std::vector<InfoBase*>& diskData = SystemCallDisk::getInstance()->getInfo();
+
+        std::vector<PartitionInfo*> partitions;
+        for (InfoBase* base : diskData) {
+            if (PartitionInfo* p = dynamic_cast<PartitionInfo*>(base)) {
+                partitions.push_back(p);
+            }
+        }
+
+        onDiskListUpdated(partitions);
+    }
+
+    
+}
+
+void MainWindow::onClikedButtonC() {
+    ui->ProcessDataViewA->clear();
+    ui->ButtonC->setChecked(true);
+    ui->ButtonA->setChecked(false);
+    ui->ButtonB->setChecked(false);
+    ui->stackedWidgetMaster->setCurrentIndex(0);
+    setActiveButton(ui->ButtonC);
+}
+
+void MainWindow::showTableView() {
+    if (processTableWidget) processTableWidget->show();
+    if (fileTreeView) fileTreeView->hide();
+}
+
+void MainWindow::showFileTreeView(const QString& path) {
+    if (!fileSystemModel || !fileTreeView) return;
+
+    QModelIndex index = fileSystemModel->index(path);
+    fileTreeView->setRootIndex(index);
+
+    fileTreeView->show();
+    if (processTableWidget) processTableWidget->hide();
+}
+
 
 MainWindow::~MainWindow(){
     delete ui;
@@ -77,6 +181,38 @@ void MainWindow::onProcessTableRowClicked(int row) {
                     ui->ProcessDataViewA->setItem(i, 5, new QTableWidgetItem(QString::number(thread.swichContextVoluntary)));
                     ui->ProcessDataViewA->setItem(i, 6, new QTableWidgetItem(QString::fromStdString(thread.state)));
                 }
+                // Preencher labels a partir do índice 12 com informações do processo
+                QStringList titles = {
+                    "PID", "Nome", "Usuário", "Memória (KB)", "N° Threads",
+                    "Trocas Involuntárias", "Trocas Voluntárias", "Estado",
+                    "Stack Size (KB)", "Heap Size (KB)"
+                };
+
+                QStringList values = {
+                    QString::fromStdString(process->pid),
+                    QString::fromStdString(process->name),
+                    QString::fromStdString(process->user),
+                    QString::number(process->memory),
+                    QString::number(process->threads.size()),
+                    QString::number(process->swichContextInvoluntary),
+                    QString::number(process->swichContextVoluntary),
+                    QString::fromStdString(process->state),
+                    QString::number(process->stackSize),
+                    QString::number(process->heapSize)
+                };
+
+                for (int i = 0; i < titles.size(); ++i) {
+                    QLabel* titleLabel = findChild<QLabel*>("inforTitle" + QString::number(i + 12));
+                    QLabel* valueLabel = findChild<QLabel*>("infor" + QString::number(i + 12));
+                    
+                    if (titleLabel && valueLabel) {
+                        titleLabel->setText(titles[i]);
+                        valueLabel->setText(values[i]);
+
+                        titleLabel->adjustSize();
+                        valueLabel->adjustSize();
+                    }
+                }
 
                 break; // Encerra o loop após encontrar o processo
             }
@@ -96,38 +232,132 @@ void clearTableWidget(QTableWidget* table) {
 }
 
 void MainWindow::onClickedButtonProcess() {
+    setActiveButton(ui->ProcessButton);
     ui->ProcessDataViewA->clear();
+    desativeButtons();
     ui->ProcessButton->setChecked(true);
-    ui->MemoryButton->setChecked(false);
-    ui->PerformanceButton->setChecked(false);
-    ui->FilesButton->setChecked(false);
+    ui->stackedWidgetMain->setCurrentIndex(0);
+    fileTreeView->hide();
+    clearAllTexts();
+    ui->titleA->setText("Process Information");
+    ui->ButtonA->setText("General");
+    ui->ButtonB->setText("Threads");
+    ui->ButtonC->setText("Resources");
+
+    ui->inforTitle12->setText("Student 1");
+    ui->inforTitle13->setText("Student 2");
+    ui->inforTitle14->setText("Teacher");
+    ui->inforTitle15->setText("Course");
+
+    ui->infor12->setText("Robson B.");
+    ui->infor13->setText("Joao R.");
+    ui->infor14->setText("Aurelio");
+    ui->infor15->setText("Op. Sistems");
 }
 
 void MainWindow::onClickedButtonMemory() {
+    setActiveButton(ui->MemoryButton);
     ui->ProcessDataViewA->clear();
+    desativeButtons();
     ui->MemoryButton->setChecked(true);
-    ui->ProcessButton->setChecked(false);
-    ui->PerformanceButton->setChecked(false);
-    ui->FilesButton->setChecked(false);
-
+    ui->stackedWidgetMain->setCurrentIndex(0);
+    fileTreeView->hide();
 }
 
 void MainWindow::onClickedButtonPerformace() {
+    setActiveButton(ui->PerformanceButton);
     ui->ProcessDataViewA->clear();
+    desativeButtons();
     ui->PerformanceButton->setChecked(true);
-    ui->ProcessButton->setChecked(false);
-    ui->MemoryButton->setChecked(false);
-    ui->FilesButton->setChecked(false);
+    ui->stackedWidgetMain->setCurrentIndex(0);
+    fileTreeView->hide();
+    clearAllTexts();
+
 }
 
 void MainWindow::onClickedButtonFiles() {
-    ui->ProcessDataViewA->clear();
+    clearAllTexts();
+    ui->ButtonA->setText("Void");
+    ui->ButtonB->setText("Partitions");
+    ui->ButtonC->setText("Students");
+
+    ui->inforTitle12->setText("Student 1");
+    ui->inforTitle13->setText("Student 2");
+    ui->inforTitle14->setText("Teacher");
+    ui->inforTitle15->setText("Course");
+
+    ui->infor12->setText("Robson B.");
+    ui->infor13->setText("Joao R.");
+    ui->infor14->setText("Aurelio");
+    ui->infor15->setText("Op. Sistems");
+
+    setActiveButton(ui->FilesButton);
+    // Marcar o botão como ativo e desmarcar os outros
+    desativeButtons();
     ui->FilesButton->setChecked(true);
-    ui->ProcessButton->setChecked(false);
-    ui->MemoryButton->setChecked(false);
-    ui->PerformanceButton->setChecked(false);
+    ui->stackedWidgetMain->setCurrentIndex(1); // muda a pagina que aparece na stack para a árvore de arquivos
+    if (fileTreeView) {
+        fileTreeView->show();
+    }
+    // Garantir que está no layout correto (caso ainda não tenha sido adicionado)
+    if (ui->frameContent->layout() && !fileTreeView->parent()) {
+        ui->frameContent->layout()->addWidget(fileTreeView);
+    }
+
+
 }
 
+void MainWindow::updateGeneralDataPartitions(const std::vector<PartitionInfo*>& list) {
+    if (list.empty()) return;
+    ui->stackedWidgetMaster->setCurrentIndex(0);
+    clearTableWidget(ui->processTable);
+    ui->processTable->clearContents();
+    ui->processTable->clear();
+    ui->processTable->setRowCount(list.size());
+    ui->processTable->setColumnCount(7);
+
+    QStringList headers = {
+        "Dispositivo", "Ponto de Montagem", "Tipo de FS",
+        "Tamanho Total (MB)", "Usado (MB)", "Disponível (MB)", "Uso (%)"
+    };
+    ui->processTable->setHorizontalHeaderLabels(headers);
+
+    for (size_t row = 0; row < list.size(); ++row) {
+        const PartitionInfo* p = list[row];
+        ui->processTable->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(p->device)));
+        ui->processTable->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(p->mountPoint)));
+        ui->processTable->setItem(row, 2, new QTableWidgetItem(QString::fromStdString(p->filesystemType)));
+        ui->processTable->setItem(row, 3, new QTableWidgetItem(QString::number(p->totalSize / 1024 / 1024)));
+        ui->processTable->setItem(row, 4, new QTableWidgetItem(QString::number(p->usedSize / 1024 / 1024)));
+        ui->processTable->setItem(row, 5, new QTableWidgetItem(QString::number(p->availableSize / 1024 / 1024)));
+        ui->processTable->setItem(row, 6, new QTableWidgetItem(QString::number(p->usagePercentage, 'f', 2) + "%"));
+    }
+}
+
+void MainWindow::onClickedButtonPartitions() {
+    clearAllTexts();
+    desativeButtons();
+    ui->PartitionsButton->setChecked(true);
+    setActiveButton(ui->PartitionsButton);
+    
+
+    ui->stackedWidgetMain->setCurrentIndex(0); // Mostra a tela da tabela
+    fileTreeView->hide();
+
+    ui->titleA->setText("Partitions Information");
+
+    SystemCallDisk::getInstance()->updateDiskPartitions();
+    const std::vector<InfoBase*>& raw = SystemCallDisk::getInstance()->getInfo();
+
+    std::vector<PartitionInfo*> partitions;
+    for (InfoBase* base : raw) {
+        if (PartitionInfo* part = dynamic_cast<PartitionInfo*>(base)) {
+            partitions.push_back(part);
+        }
+    }
+
+    updateGeneralDataPartitions(partitions);
+}
 
    
 void MainWindow::updateGeneralDataProcess(const std::vector<ProcessInfo*> list) {
@@ -148,7 +378,7 @@ void MainWindow::updateGeneralDataProcess(const std::vector<ProcessInfo*> list) 
     for (const auto &process : list) {
         totalMemory += process->memory; // Soma a memória de cada processo
     }
-
+    
     clearTableWidget(ui->GeneralDataView); // Limpa a tabela antes de adicionar novos dados
     ui->GeneralDataView->clearContents();
     ui->GeneralDataView->clear(); // Limpa a tabela antes de adicionar novos dados
@@ -160,6 +390,7 @@ void MainWindow::updateGeneralDataProcess(const std::vector<ProcessInfo*> list) 
     ui->GeneralDataView->setItem(0, 1, new QTableWidgetItem(QString::number(qtdTotalThreads)));
     ui->GeneralDataView->setItem(0, 2, new QTableWidgetItem(QString::number(totalMemory / 1024))); // Convertendo para MB
     ui->GeneralDataView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
 }
 
 void MainWindow::updateGeneralDataMemory(const std::vector<MemoryInfo*> list) {
@@ -170,36 +401,103 @@ void MainWindow::updateGeneralDataMemory(const std::vector<MemoryInfo*> list) {
 }
 
 void MainWindow::onProcessListUpdated(const std::vector<ProcessInfo*> list) {
-    if(list.empty()) { 
-        return; 
-    } 
-    
-    clearTableWidget(ui->processTable); // Limpa a tabela antes de adicionar novos dados
+    if (list.empty()) {
+        return;
+    }
+
+
+    // === Cálculo de métricas ===
+    int totalProcessos = list.size();
+    int totalThreads = 0;
+    unsigned long totalMemoriaKB = 0;
+    unsigned long totalHeapKB = 0;
+    unsigned long totalStackKB = 0;
+    unsigned long totalCtxVoluntary = 0;
+    unsigned long totalCtxInvoluntary = 0;
+
+    for (const auto& proc : list) {
+        totalThreads += proc->threads.size();
+        totalMemoriaKB += proc->memory;
+        totalHeapKB += proc->heapSize;
+        totalStackKB += proc->stackSize;
+        totalCtxVoluntary += proc->swichContextVoluntary;
+        totalCtxInvoluntary += proc->swichContextInvoluntary;
+    }
+
+    // === Dados agregados nos labels ===
+    QStringList titles = {
+        "Total de Processos",
+        "Total de Threads",
+        "Memória Total (MB)",
+        "Total Heap (KB)",
+        "Total Stack (KB)",
+        "Context Switch Voluntary",
+        "Context Switch Involuntary"
+    };
+
+    QStringList values = {
+        QString::number(totalProcessos),
+        QString::number(totalThreads),
+        QString::number(totalMemoriaKB / 1024), // em MB
+        QString::number(totalHeapKB),
+        QString::number(totalStackKB),
+        QString::number(totalCtxVoluntary),
+        QString::number(totalCtxInvoluntary)
+    };
+
+    for (int i = 0; i < titles.size(); ++i) {
+        QLabel* titleLabel = findChild<QLabel*>("inforTitle" + QString::number(i));
+        QLabel* valueLabel = findChild<QLabel*>("infor" + QString::number(i));
+
+        if (titleLabel && valueLabel) {
+            titleLabel->setText(titles[i]);
+            valueLabel->setText(values[i]);
+        }
+    }
+
+    // === Atualização da tabela (mantida do seu código) ===
+    clearTableWidget(ui->processTable);
     ui->processTable->clearContents();
     ui->processTable->clear();
     ui->processTable->setRowCount(list.size());
-    updateGeneralDataProcess(list); // Atualiza os dados gerais dos processos
-    
     update = true;
 
-    ui->processTable->setColumnCount(10); // Exemplo: PID, Nome, Usuário, Memória
-    QStringList headers = {"PID", "Nome", "Usuário", "Memória(KB)", "N Threads", "Switch Context Involuntary", "Switch Context Voluntary", "State", "Stack Size (KB)", "Heap Size (KB)"};
+    ui->processTable->setColumnCount(10);
+    QStringList headers = {
+        "PID", "Nome", "Usuário", "Memória(KB)", "N Threads",
+        "Switch Context Involuntary", "Switch Context Voluntary",
+        "State", "Stack Size (KB)", "Heap Size (KB)"
+    };
     ui->processTable->setHorizontalHeaderLabels(headers);
 
-    for (size_t row = 0; row < list.size(); ++row) { // Alterado int para size_t
+    for (size_t row = 0; row < list.size(); ++row) {
         const ProcessInfo* p = list[row];
         ui->processTable->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(p->pid)));
         ui->processTable->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(p->name)));
         ui->processTable->setItem(row, 2, new QTableWidgetItem(QString::fromStdString(p->user)));
-        ui->processTable->setItem(row, 3, new QTableWidgetItem(QString::number(p->memory)));  
-        ui->processTable->setItem(row, 4, new QTableWidgetItem(QString::number(p->threads.size()))); // Número de threads
+        ui->processTable->setItem(row, 3, new QTableWidgetItem(QString::number(p->memory)));
+        ui->processTable->setItem(row, 4, new QTableWidgetItem(QString::number(p->threads.size())));
         ui->processTable->setItem(row, 5, new QTableWidgetItem(QString::number(p->swichContextInvoluntary)));
         ui->processTable->setItem(row, 6, new QTableWidgetItem(QString::number(p->swichContextVoluntary)));
         ui->processTable->setItem(row, 7, new QTableWidgetItem(QString::fromStdString(p->state)));
-        ui->processTable->setItem(row, 8, new QTableWidgetItem(QString::number(p->stackSize))); // Tamanho da pilha
-        ui->processTable->setItem(row, 9, new QTableWidgetItem(QString::number(p->heapSize))); // Tamanho do heap
-    }   
+        ui->processTable->setItem(row, 8, new QTableWidgetItem(QString::number(p->stackSize)));
+        ui->processTable->setItem(row, 9, new QTableWidgetItem(QString::number(p->heapSize)));
+    }
+    for (int i = 0; i < titles.size(); ++i) {
+    QLabel* titleLabel = findChild<QLabel*>("inforTitle" + QString::number(i));
+    QLabel* valueLabel = findChild<QLabel*>("infor" + QString::number(i));
+
+    if (titleLabel && valueLabel) {
+        titleLabel->setText(titles[i]);
+        titleLabel->adjustSize();
+
+        valueLabel->setText(values[i]);
+        valueLabel->adjustSize();
+    }
 }
+
+}
+
 
 void MainWindow::updateGeneralDataCPU(const std::vector<CPUInfo*> list) {
     if (list.empty() || !ui->PerformanceButton->isChecked()) {
@@ -227,7 +525,7 @@ void MainWindow::onMemoryListUpdated(const std::vector<MemoryInfo*> list) {
     }
 
     clearTableWidget(ui->ProcessDataViewA); // Limpa a tabela antes de adicionar novos dados
-    ui->GeneralDataView->clearContents();
+    ui->ProcessDataViewA->clearContents();
     ui->ProcessDataViewA->clear();
     ui->ProcessDataViewA->setRowCount(1);
     ui->ProcessDataViewA->setColumnCount(5); // Total, Free, Used, Buffers, Cached
@@ -261,4 +559,127 @@ void MainWindow::onCPUListUpdated(const std::vector<CPUInfo*> list) {
         ui->ProcessDataViewA->setItem(row, 3, new QTableWidgetItem(QString::number(c->idleTime)));
         ui->ProcessDataViewA->setItem(row, 4, new QTableWidgetItem(QString::number(c->cpuMhz)));
     }
+}
+
+void MainWindow::onDiskListUpdated(const std::vector<PartitionInfo*> list) {
+    if (list.empty() || !ui->FilesButton->isChecked()) {
+        return; // Se a lista estiver vazia ou aba de disco não estiver ativa, não faz nada
+    }
+
+    clearTableWidget(ui->ProcessDataViewA); // Limpa a tabela antes de adicionar novos dados
+    ui->ProcessDataViewA->clearContents();
+    ui->ProcessDataViewA->clear();
+    ui->ProcessDataViewA->setRowCount(list.size());
+    ui->ProcessDataViewA->setColumnCount(7);
+
+    QStringList headers = {
+        "Dispositivo", "Ponto de Montagem", "Tipo de FS",
+        "Tamanho Total (MB)", "Usado (MB)", "Disponível (MB)", "Uso (%)"
+    };
+    ui->ProcessDataViewA->setHorizontalHeaderLabels(headers);
+
+    for (size_t row = 0; row < list.size(); ++row) {
+        const PartitionInfo* p = list[row];
+        ui->ProcessDataViewA->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(p->device)));
+        ui->ProcessDataViewA->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(p->mountPoint)));
+        ui->ProcessDataViewA->setItem(row, 2, new QTableWidgetItem(QString::fromStdString(p->filesystemType)));
+        ui->ProcessDataViewA->setItem(row, 3, new QTableWidgetItem(QString::number(p->totalSize / 1024 / 1024)));
+        ui->ProcessDataViewA->setItem(row, 4, new QTableWidgetItem(QString::number(p->usedSize / 1024 / 1024)));
+        ui->ProcessDataViewA->setItem(row, 5, new QTableWidgetItem(QString::number(p->availableSize / 1024 / 1024)));
+        ui->ProcessDataViewA->setItem(row, 6, new QTableWidgetItem(QString::number(p->usagePercentage, 'f', 2) + "%"));
+    }
+    update = true;
+}
+
+void MainWindow::setActiveButton(QPushButton* active) {
+    QList<QPushButton*> buttons = {
+        ui->ProcessButton,
+        ui->PerformanceButton,
+        ui->MemoryButton,
+        ui->FilesButton,
+        ui->ButtonA,
+        ui->ButtonB,
+        ui->ButtonC,
+        ui->PartitionsButton
+    };
+
+    for (QPushButton* button : buttons) {
+        if (button == active || button->isChecked()) {
+            button->setStyleSheet("background-color: #F15025; color: white;");
+        } else {
+            button->setStyleSheet("background-color: #D1D1D1; color: gray;");
+        }
+    }
+}
+
+void MainWindow::desativeButtons(){
+    QList<QPushButton*> buttons = {
+        ui->ProcessButton,
+        ui->PerformanceButton,
+        ui->MemoryButton,
+        ui->FilesButton,
+        ui->ButtonA,
+        ui->ButtonB,
+        ui->ButtonC,
+        ui->PartitionsButton
+    };
+
+    for (QPushButton* button : buttons) {
+        button->setChecked(false);
+        button->setStyleSheet("background-color: #D1D1D1; color: gray;");
+    }
+}
+
+void MainWindow::clearAllTexts() {
+    ui->titleA->setText("");
+
+    ui->inforTitle0->setText("");
+    ui->inforTitle1->setText("");
+    ui->inforTitle2->setText("");
+    ui->inforTitle3->setText("");
+    ui->inforTitle4->setText("");
+    ui->inforTitle5->setText("");
+    ui->inforTitle6->setText("");
+    ui->inforTitle7->setText("");
+    ui->inforTitle8->setText("");
+    ui->inforTitle9->setText("");
+    ui->inforTitle10->setText("");
+    ui->inforTitle11->setText("");
+    ui->inforTitle12->setText("");
+    ui->inforTitle13->setText("");
+    ui->inforTitle14->setText("");
+    ui->inforTitle15->setText("");
+    ui->inforTitle16->setText("");
+    ui->inforTitle17->setText("");
+    ui->inforTitle18->setText("");
+    ui->inforTitle19->setText("");
+    ui->inforTitle20->setText("");
+    ui->inforTitle21->setText("");
+    ui->inforTitle22->setText("");
+    ui->inforTitle23->setText("");
+
+    ui->infor0->setText("");
+    ui->infor1->setText("");
+    ui->infor2->setText("");
+    ui->infor3->setText("");
+    ui->infor4->setText("");
+    ui->infor5->setText("");
+    ui->infor6->setText("");
+    ui->infor7->setText("");
+    ui->infor8->setText("");
+    ui->infor9->setText("");
+    ui->infor10->setText("");
+    ui->infor11->setText("");
+    ui->infor12->setText("");
+    ui->infor13->setText("");
+    ui->infor14->setText("");
+    ui->infor15->setText("");
+    ui->infor16->setText("");
+    ui->infor17->setText("");
+    ui->infor18->setText("");
+    ui->infor19->setText("");
+    ui->infor20->setText("");
+    ui->infor21->setText("");
+    ui->infor22->setText("");
+    ui->infor23->setText("");
 }

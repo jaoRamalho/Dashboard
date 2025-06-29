@@ -15,6 +15,8 @@ int main(int argc, char *argv[])
     qRegisterMetaType<std::vector<ProcessInfo*>>("std::vector<ProcessInfo*>");
     qRegisterMetaType<std::vector<CPUInfo*>>("std::vector<CPUInfo*>");
     qRegisterMetaType<std::vector<MemoryInfo*>>("std::vector<MemoryInfo*>");
+    qRegisterMetaType<std::vector<PartitionInfo*>>("std::vector<PartitionInfo*>");
+    qRegisterMetaType<std::vector<FileSystemNode>>("std::vector<FileSystemNode*>");
     QApplication a(argc, argv);
 
     

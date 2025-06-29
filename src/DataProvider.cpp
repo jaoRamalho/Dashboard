@@ -2,6 +2,8 @@
 #include "include/SystemCallProcesses.hpp"
 #include "include/SystemCallMemory.hpp"
 #include "include/SystemCallCPU.hpp"
+#include "include/SystemCallDisk.hpp"
+#include "include/SystemCallFiles.hpp"
 
 #include <thread>
 
@@ -31,12 +33,26 @@ void DataProvider::loop() {
         SystemCallCPU* sysCallCPU = SystemCallCPU::getInstance();
         SystemCallMemory* sysCallMemory = SystemCallMemory::getInstance();
         SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
-
+        SystemCallDisk* sysCallDisk = SystemCallDisk::getInstance();
+        SystemCallFiles* sysCallFiles = SystemCallFiles::getInstance();
 
         std::vector<ProcessInfo*> processList;
         std::vector<CPUInfo*> cpuList;
         std::vector<MemoryInfo*> memoryList;
+        std::vector<PartitionInfo*> diskList;
+        std::vector<FileSystemNode*> filesList;
 
+        if (sysCallFiles != nullptr){
+            if(sysCallFiles->isAccessible()) {
+                for (auto& base : sysCallFiles->getInfo()) {
+                    FileSystemNode* p = dynamic_cast<FileSystemNode*>(base);
+                    if (p) filesList.push_back(p);
+                }
+                if (filesList.size() > 0)
+                    emit filesListUpdated(filesList);
+            }
+        }
+        
         if (sysCallProcesses != nullptr){
             if(sysCallProcesses->isAccessible()) {
                 for (auto& base : sysCallProcesses->getInfo()) {
@@ -47,7 +63,17 @@ void DataProvider::loop() {
                     emit processListUpdated(processList);
             }
         }
-    
+
+        if (sysCallDisk != nullptr){
+            if(sysCallDisk->isAccessible()) {
+                for (auto& base : sysCallDisk->getInfo()) {
+                    PartitionInfo* p = dynamic_cast<PartitionInfo*>(base);
+                    if (p) diskList.push_back(p);
+                }
+                if (diskList.size() > 0)
+                    emit diskListUpdated(diskList);
+            }
+        }
 
         if(sysCallMemory != nullptr){
             if (sysCallMemory->isAccessible()){
