@@ -22,16 +22,12 @@ SystemCallMemory* SystemCallMemory::getInstance(QObject* parent) {
 }
 
 void SystemCallMemory::updateMemory() {
-    std::lock_guard<std::mutex> lock(mtx);
-    for (int i = 0; i < (int)info.size(); i++) {
-        MemoryInfo* m = dynamic_cast<MemoryInfo*>(info[i]);
-        if (m) {
-            delete m;
-            info[i] = nullptr;
-        }
+    //std::lock_guard<std::mutex> lock(globalMutex);
+    for (InfoBase* m : info) {
+        delete m;
     }
+    info.clear();
 
-    this->info.clear();
     MemoryInfo* memInfo = new MemoryInfo();
 
     std::ifstream memFile("/proc/meminfo");

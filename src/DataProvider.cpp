@@ -38,6 +38,7 @@ void DataProvider::loop() {
         std::vector<MemoryInfo*> memoryList;
 
         if (sysCallProcesses != nullptr){
+            std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
             if(sysCallProcesses->isAccessible()) {
                 for (auto& base : sysCallProcesses->getInfo()) {
                     ProcessInfo* p = dynamic_cast<ProcessInfo*>(base);
@@ -50,6 +51,7 @@ void DataProvider::loop() {
     
 
         if(sysCallMemory != nullptr){
+            std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de memória
             if (sysCallMemory->isAccessible()){
                 for (auto& base : sysCallMemory->getInfo()) {
                     MemoryInfo* m = dynamic_cast<MemoryInfo*>(base);
@@ -62,6 +64,7 @@ void DataProvider::loop() {
 
 
         if (sysCallCPU != nullptr){
+            std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de CPU
             if (sysCallCPU->isAccessible()){
                 for (auto& base : sysCallCPU->getInfo()) {
                     CPUInfo* c = dynamic_cast<CPUInfo*>(base);

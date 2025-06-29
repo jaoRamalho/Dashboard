@@ -34,16 +34,12 @@ std::vector<std::string> getThreadIDs(const std::string& pid) {
 }
 
 void SystemCallProcesses::updateProcesses() {
-    std::lock_guard<std::mutex> lock(mtx);
-    for (int i = 0; i < (int)info.size(); i++) {
-        ProcessInfo* p = dynamic_cast<ProcessInfo*>(info[i]);
-        if (p) {
-            delete p;
-            info[i] = nullptr;
-        }
+    //std::lock_guard<std::mutex> lock(globalMutex);
+    for (InfoBase* p : info) {
+        delete p;
     }
+    info.clear();
 
-    this->info.clear();
     namespace fs = std::filesystem;
     for (const auto& entry : fs::directory_iterator("/proc")) {
         if (entry.is_directory()) {

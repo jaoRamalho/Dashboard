@@ -29,6 +29,8 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::onProcessTableRowClicked(int row) {
+    std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
+    
     if (row < 0 || row >= ui->processTable->rowCount() || !update) {
         return; // Verifica se a linha é válida
     }
@@ -37,7 +39,6 @@ void MainWindow::onProcessTableRowClicked(int row) {
     if (item) {
         QString pid = item->text();
 
-        std::lock_guard<std::mutex> lock(processMutex); // Protege o acesso à lista de processos
         std::vector<InfoBase*> baseCopy = SystemCallProcesses::getInstance()->getInfo();
         
         // Obtém o vetor de InfoBase* e converte para ProcessInfo*

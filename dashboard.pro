@@ -18,7 +18,8 @@ SOURCES += \
     src/SystemCallCPU.cpp \
     src/SystemCallMemory.cpp \
     src/SystemCallProcesses.cpp \
-    src/Dashboard.cpp
+    src/Dashboard.cpp \
+    src/MyMutex.cpp
 
 HEADERS += \
     include/SystemCall.hpp \
@@ -30,7 +31,8 @@ HEADERS += \
     include/SystemCallCPU.hpp \ 
     include/SystemCallMemory.hpp \
     include/SystemCallProcesses.hpp \
-    include/Dashboard.hpp
+    include/Dashboard.hpp \
+    include/MyMutex.hpp
 
 FORMS += \
     mainwindow.ui

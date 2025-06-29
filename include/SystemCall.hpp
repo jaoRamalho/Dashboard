@@ -3,6 +3,7 @@
 
 #include "ProcessInfo.h"
 #include "MyObject.hpp"
+#include "MyMutex.hpp"
 
 #include <vector>
 #include <string>
@@ -12,12 +13,10 @@
 #include <thread>
 #include <chrono>
 #include <filesystem>
-#include <mutex>
 
 class SystemCall : public MyObject{
     Q_OBJECT
 protected:
-    std::mutex mtx;
     bool acessible;
     std::vector<InfoBase*> info;
     
