@@ -4,6 +4,7 @@
 #include "include/SystemCallCPU.hpp"
 #include "include/SystemCallDisk.hpp"
 #include "include/SystemCallFiles.hpp"
+#include "include/MyMutex.hpp"
 
 #include <thread>
 
@@ -30,26 +31,29 @@ DataProvider* DataProvider::getInstance(QObject* parent) {
 
 void DataProvider::loop() {
     while (isRunning) {
+        std::lock_guard<std::mutex> lock(globalMutex);
         SystemCallCPU* sysCallCPU = SystemCallCPU::getInstance();
         SystemCallMemory* sysCallMemory = SystemCallMemory::getInstance();
         SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
         SystemCallDisk* sysCallDisk = SystemCallDisk::getInstance();
         SystemCallFiles* sysCallFiles = SystemCallFiles::getInstance();
 
-        std::vector<ProcessInfo*> processList;
-        std::vector<CPUInfo*> cpuList;
-        std::vector<MemoryInfo*> memoryList;
-        std::vector<PartitionInfo*> diskList;
-        std::vector<FileSystemNode*> filesList;
+        std::vector<ProcessInfo> processList;
+        std::vector<CPUInfo> cpuList;
+        std::vector<MemoryInfo> memoryList;
+        std::vector<PartitionInfo> diskList;
+        std::vector<FileSystemNode> filesList;
 
         if (sysCallFiles != nullptr){
             if(sysCallFiles->isAccessible()) {
                 for (auto& base : sysCallFiles->getInfo()) {
                     FileSystemNode* p = dynamic_cast<FileSystemNode*>(base);
-                    if (p) filesList.push_back(p);
+                    if (p) filesList.push_back(*p);
                 }
-                if (filesList.size() > 0)
+                if (!filesList.empty()) {
                     emit filesListUpdated(filesList);
+                    std::cout << "Files List Updated" << std::endl;
+                }
             }
         }
         
@@ -57,10 +61,12 @@ void DataProvider::loop() {
             if(sysCallProcesses->isAccessible()) {
                 for (auto& base : sysCallProcesses->getInfo()) {
                     ProcessInfo* p = dynamic_cast<ProcessInfo*>(base);
-                    if (p) processList.push_back(p);
+                    if (p) processList.push_back(*p);
                 }
-                if (processList.size() > 0)
+                if (!processList.empty()) {
                     emit processListUpdated(processList);
+                    std::cout << "Process List Updated" << std::endl;
+                }
             }
         }
 
@@ -68,10 +74,12 @@ void DataProvider::loop() {
             if(sysCallDisk->isAccessible()) {
                 for (auto& base : sysCallDisk->getInfo()) {
                     PartitionInfo* p = dynamic_cast<PartitionInfo*>(base);
-                    if (p) diskList.push_back(p);
+                    if (p) diskList.push_back(*p);
                 }
-                if (diskList.size() > 0)
+                if (!diskList.empty()) {
                     emit diskListUpdated(diskList);
+                    std::cout << "Disk List Updated" << std::endl;
+                }
             }
         }
 
@@ -79,22 +87,25 @@ void DataProvider::loop() {
             if (sysCallMemory->isAccessible()){
                 for (auto& base : sysCallMemory->getInfo()) {
                     MemoryInfo* m = dynamic_cast<MemoryInfo*>(base);
-                    if (m) memoryList.push_back(m);
+                    if (m) memoryList.push_back(*m);
                 }
-                if (memoryList.size() > 0)
+                if (!memoryList.empty()){
                     emit memoryListUpdated(memoryList);
+                    std::cout << "Memory List Updated" << std::endl;
+                }
             }
         }
-
 
         if (sysCallCPU != nullptr){
             if (sysCallCPU->isAccessible()){
                 for (auto& base : sysCallCPU->getInfo()) {
                     CPUInfo* c = dynamic_cast<CPUInfo*>(base);
-                    if (c) cpuList.push_back(c);
+                    if (c) cpuList.push_back(*c);
                 }
-                if (memoryList.size() > 0)
+                if (!cpuList.empty()) {
                     emit cpuListUpdated(cpuList);
+                    std::cout << "CPU List Updated" << std::endl;
+                }
             }
         }
 

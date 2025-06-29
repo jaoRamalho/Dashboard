@@ -1,4 +1,5 @@
 #include "include/SystemCallCPU.hpp"
+#include "include/MyMutex.hpp"
 
 
 SystemCallCPU* SystemCallCPU::instance = nullptr;
@@ -21,13 +22,9 @@ SystemCallCPU* SystemCallCPU::getInstance(QObject* parent) {
     return instance;
 }
 void SystemCallCPU::updateCPU() {
-    std::lock_guard<std::mutex> lock(mtx);
-    for (int i = 0; i < (int)info.size(); i++) {
-        CPUInfo* c = dynamic_cast<CPUInfo*>(info[i]);
-        if (c) {
-            delete c;
-            info[i] = nullptr;
-        }
+    //std::lock_guard<std::mutex> lock(globalMutex);
+    for (auto& inst : info) {
+        delete inst; // Limpa a memória dos objetos anteriores
     }
 
     this->info.clear();

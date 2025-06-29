@@ -1,4 +1,5 @@
 #include "include/SystemCallMemory.hpp"
+#include "include/MyMutex.hpp"
 
 
 SystemCallMemory* SystemCallMemory::instance = nullptr;
@@ -22,15 +23,10 @@ SystemCallMemory* SystemCallMemory::getInstance(QObject* parent) {
 }
 
 void SystemCallMemory::updateMemory() {
-    std::lock_guard<std::mutex> lock(mtx);
-    for (int i = 0; i < (int)info.size(); i++) {
-        MemoryInfo* m = dynamic_cast<MemoryInfo*>(info[i]);
-        if (m) {
-            delete m;
-            info[i] = nullptr;
-        }
+    //std::lock_guard<std::mutex> lock(globalMutex);
+    for (auto& inst : info) {
+        delete inst; // Limpa a memória dos objetos anteriores
     }
-
     this->info.clear();
     MemoryInfo* memInfo = new MemoryInfo();
 

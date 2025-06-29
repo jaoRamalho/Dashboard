@@ -72,11 +72,10 @@ FileSystemNode scanDirectory(const std::filesystem::path& path) {
 }
 
 void SystemCallFiles::updateFileSystemTree(const std::string& rootPath) {
-    std::lock_guard<std::mutex> lock(mtx);
+    //std::lock_guard<std::mutex> lock(globalMutex);
 
     for (auto& ptr : info) {
         delete ptr;
-        ptr = nullptr;
     }
     info.clear();
 

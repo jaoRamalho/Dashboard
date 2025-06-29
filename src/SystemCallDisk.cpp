@@ -22,15 +22,11 @@ SystemCallDisk* SystemCallDisk::getInstance(QObject* parent) {
     return instance;
 }
 void SystemCallDisk::updateDiskPartitions() {
-    std::lock_guard<std::mutex> lock(mtx);
+    //std::lock_guard<std::mutex> lock(globalMutex);
 
     // Limpa as informações antigas
-    for (size_t i = 0; i < info.size(); ++i) {
-        PartitionInfo* p = dynamic_cast<PartitionInfo*>(info[i]);
-        if (p) {
-            delete p;
-            info[i] = nullptr;
-        }
+    for (auto& inst : info) {
+        delete inst; // Limpa a memória dos objetos anteriores
     }
     info.clear();
 

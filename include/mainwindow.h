@@ -24,7 +24,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    std::mutex processMutex; 
     bool update = false; // Flag para verificar se a linha da tabela foi clicada
     QTreeView* fileTreeView = nullptr;
     QTableWidget* processTableWidget = nullptr;
@@ -33,14 +32,14 @@ public:
     void showTableView();
 
 private slots:
-    void onProcessListUpdated(const std::vector<ProcessInfo*>);
-    void onMemoryListUpdated(const std::vector<MemoryInfo*>);
-    void onCPUListUpdated(const std::vector<CPUInfo*>);
-    void onDiskListUpdated(const std::vector<PartitionInfo*>);
-    void updateGeneralDataProcess(const std::vector<ProcessInfo*>);
-    void updateGeneralDataMemory(const std::vector<MemoryInfo*>);
-    void updateGeneralDataCPU(const std::vector<CPUInfo*>);
-    void updateGeneralDataPartitions(const std::vector<PartitionInfo*>& list);
+    void onProcessListUpdated(const std::vector<ProcessInfo>);
+    void onMemoryListUpdated(const std::vector<MemoryInfo>);
+    void onCPUListUpdated(const std::vector<CPUInfo>);
+    void onDiskListUpdated(const std::vector<PartitionInfo>);
+    void updateGeneralDataProcess(const std::vector<ProcessInfo>);
+    void updateGeneralDataMemory(const std::vector<MemoryInfo>);
+    void updateGeneralDataCPU(const std::vector<CPUInfo>);
+    void updateGeneralDataPartitions(const std::vector<PartitionInfo> list);
     //void updateGeneralDataDisk(const std::vector<PartitionInfo*>);
     void onClickedButtonPartitions();
     void onClickedButtonProcess();

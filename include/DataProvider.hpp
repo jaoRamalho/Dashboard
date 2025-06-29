@@ -23,11 +23,11 @@ public slots:
     void loop();
 
 signals:
-    void processListUpdated(const std::vector<ProcessInfo*>&);
-    void cpuListUpdated(const std::vector<CPUInfo*>&);
-    void memoryListUpdated(const std::vector<MemoryInfo*>&);
-    void diskListUpdated(const std::vector<PartitionInfo*>&);
-    void filesListUpdated(const std::vector<FileSystemNode*>&);
+    void processListUpdated(const std::vector<ProcessInfo>&);
+    void cpuListUpdated(const std::vector<CPUInfo>&);
+    void memoryListUpdated(const std::vector<MemoryInfo>&);
+    void diskListUpdated(const std::vector<PartitionInfo>&);
+    void filesListUpdated(const std::vector<FileSystemNode>&);
 public:
     const ProcessInfo* getProcessByPID(const std::string& pid) const;
 };

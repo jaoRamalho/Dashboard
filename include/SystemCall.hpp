@@ -13,11 +13,11 @@
 #include <chrono>
 #include <filesystem>
 #include <mutex>
+#include "MyMutex.hpp"
 
 class SystemCall : public MyObject{
     Q_OBJECT
 protected:
-    std::mutex mtx;
     bool acessible;
     std::vector<InfoBase*> info;
     
