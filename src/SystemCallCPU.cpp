@@ -14,7 +14,6 @@ SystemCallCPU::~SystemCallCPU() {
     isRunning = false;
     for (auto& inst : info) delete inst;
     info.clear();
-    instance = nullptr; // Clear the singleton instance
 }
 
 SystemCallCPU* SystemCallCPU::getInstance(QObject* parent) {

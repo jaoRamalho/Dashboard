@@ -29,7 +29,7 @@ signals:
     void diskListUpdated(const std::vector<PartitionInfo>&);
     void filesListUpdated(const std::vector<FileSystemNode>&);
 public:
-    const ProcessInfo* getProcessByPID(const std::string& pid) const;
+    const ProcessInfo getProcessByPID(const std::string& pid) const;
 };
 
 #endif // DATAPROVIDER_HPP

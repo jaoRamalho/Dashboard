@@ -17,6 +17,10 @@ SystemCallFiles::~SystemCallFiles() {
     std::cout << "SystemCallFiles destructor called" << std::endl;
     isRunning = false;
     instance = nullptr;
+    for (auto& ptr : info) {
+        delete ptr; // Limpa a memória dos objetos anteriores
+    }
+    
 }
 
 SystemCallFiles* SystemCallFiles::getInstance(QObject* parent) {

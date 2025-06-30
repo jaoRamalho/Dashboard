@@ -14,7 +14,6 @@ SystemCallDisk::~SystemCallDisk() {
     isRunning = false;
     for (auto& inst : info) delete inst;
     info.clear();
-    instance = nullptr; // Clear the singleton instance
 }
 
 SystemCallDisk* SystemCallDisk::getInstance(QObject* parent) {

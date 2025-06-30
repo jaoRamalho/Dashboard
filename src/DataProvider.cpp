@@ -45,7 +45,9 @@ void DataProvider::loop() {
 
         if (sysCallFiles != nullptr){
             if(sysCallFiles->isAccessible()) {
-                for (auto& base : sysCallFiles->getInfo()) {
+                std::lock_guard<std::mutex> lock(globalMutex);
+                std::vector<InfoBase*> fileInfo = sysCallFiles->getInfo();
+                for (auto& base : fileInfo) {
                     FileSystemNode* p = dynamic_cast<FileSystemNode*>(base);
                     if (p) filesList.push_back(*p);
                 }
@@ -56,9 +58,10 @@ void DataProvider::loop() {
         }
         
         if (sysCallProcesses != nullptr){
-            std::lock_guard<std::mutex> lock(globalMutex);
             if(sysCallProcesses->isAccessible()) {
-                for (const auto& p : sysCallProcesses->getInfo()) {
+                std::lock_guard<std::mutex> lock(globalMutex);
+                std::vector<InfoBase*> processInfo = sysCallProcesses->getInfo();
+                for (const auto& p : processInfo) {
                     ProcessInfo* process = dynamic_cast<ProcessInfo*>(p);
                     if (process) {
                         processList.push_back(*process);
@@ -71,9 +74,10 @@ void DataProvider::loop() {
         }
 
         if (sysCallDisk != nullptr){
-            std::lock_guard<std::mutex> lock(globalMutex);
             if(sysCallDisk->isAccessible()) {
-                for (auto& base : sysCallDisk->getInfo()) {
+                std::lock_guard<std::mutex> lock(globalMutex);
+                std::vector<InfoBase*> diskInfo = sysCallDisk->getInfo();
+                for (auto& base : diskInfo) {
                     PartitionInfo* p = dynamic_cast<PartitionInfo*>(base);
                     if (p) diskList.push_back(*p);
                 }
@@ -84,9 +88,10 @@ void DataProvider::loop() {
         }
 
         if(sysCallMemory != nullptr){
-            std::lock_guard<std::mutex> lock(globalMutex);
             if (sysCallMemory->isAccessible()){
-                for (auto& base : sysCallMemory->getInfo()) {
+                std::lock_guard<std::mutex> lock(globalMutex);
+                std::vector<InfoBase*> memoryInfo = sysCallMemory->getInfo();
+                for (auto& base : memoryInfo) {
                     MemoryInfo* m = dynamic_cast<MemoryInfo*>(base);
                     if (m) memoryList.push_back(*m);
                 }
@@ -97,8 +102,8 @@ void DataProvider::loop() {
         }
 
         if (sysCallCPU != nullptr){
-            std::lock_guard<std::mutex> lock(globalMutex);
             if (sysCallCPU->isAccessible()){
+                std::lock_guard<std::mutex> lock(globalMutex);
                 for (auto& base : sysCallCPU->getInfo()) {
                     CPUInfo* c = dynamic_cast<CPUInfo*>(base);
                     if (c) cpuList.push_back(*c);
@@ -113,15 +118,16 @@ void DataProvider::loop() {
     }
 }
 
-const ProcessInfo* DataProvider::getProcessByPID(const std::string& pid) const {
+const ProcessInfo DataProvider::getProcessByPID(const std::string& pid) const {
     SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
-    if (!sysCallProcesses->isAccessible()) return nullptr;
-
-    for (auto& base : sysCallProcesses->getInfo()) {
-        ProcessInfo* process = dynamic_cast<ProcessInfo*>(base);
-        if (process && process->pid == pid) {
+    if (!sysCallProcesses->isAccessible()) return ProcessInfo();
+    std::lock_guard<std::mutex> lock(globalMutex);
+    std::vector<InfoBase*> processInfo = sysCallProcesses->getInfo();
+    for (auto& base : processInfo) {
+        ProcessInfo process = *dynamic_cast<ProcessInfo*>(base);
+        if (process.pid == pid) {
             return process;
         }
     }
-    return nullptr;
+    return ProcessInfo(); // Return an empty ProcessInfo if not found
 }

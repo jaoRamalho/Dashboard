@@ -30,6 +30,11 @@ SystemCallProcesses::~SystemCallProcesses() {
     std::cout << "SystemCallProcesses destructor called" << std::endl;
     isRunning = false; // Ensure the loops stop
     instance = nullptr; // Clear the singleton instance
+    for (auto& inst : info) {
+        delete inst; // Limpa a memória dos objetos anteriores
+    }
+    info.clear(); // Limpa o vetor de informações
+    
 }
 
 SystemCallProcesses* SystemCallProcesses::getInstance(QObject* parent) {
@@ -54,6 +59,7 @@ void SystemCallProcesses::updateProcesses() {
     for (auto& inst : info) {
         delete inst; // Limpa a memória dos objetos anteriores
     }
+
     this->info.clear();
     namespace fs = std::filesystem;
     std::vector<FileLockInfo> fileLocks = getSystemFileLocks(); // Extrai locks de arquivos do sistema
@@ -166,6 +172,7 @@ TreadsInfo SystemCallProcesses::getThreadInfo(std::string pid, std::string tid){
         }
     }
     threadInfo.tid = tid;
+    statFile.close();
     return threadInfo;
 }
 
@@ -234,6 +241,7 @@ void extractRecursos(ProcessInfo& proc) {
                 proc.recursos.sockets.push_back({ tipo, localAddr, remoteAddr, state });
             }
         }
+        file.close();
     }
 }
 
@@ -289,7 +297,7 @@ std::vector<FileLockInfo> getSystemFileLocks() {
 
         locks.push_back(info);
     }
-
+    file.close();
     return locks;
 }
 

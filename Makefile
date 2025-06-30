@@ -444,6 +444,7 @@ compiler_moc_header_clean:
 moc_SystemCall.cpp: include/SystemCall.hpp \
 		include/ProcessInfo.h \
 		include/MyObject.hpp \
+		include/MyMutex.hpp \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/negodrama/Documents/Dashboard/entrega1/Dashboard/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/negodrama/Documents/Dashboard/entrega1/Dashboard -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/SystemCall.hpp -o moc_SystemCall.cpp
@@ -476,6 +477,7 @@ moc_SystemCallCPU.cpp: include/SystemCallCPU.hpp \
 		include/SystemCall.hpp \
 		include/ProcessInfo.h \
 		include/MyObject.hpp \
+		include/MyMutex.hpp \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/negodrama/Documents/Dashboard/entrega1/Dashboard/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/negodrama/Documents/Dashboard/entrega1/Dashboard -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/SystemCallCPU.hpp -o moc_SystemCallCPU.cpp
@@ -484,6 +486,7 @@ moc_SystemCallMemory.cpp: include/SystemCallMemory.hpp \
 		include/SystemCall.hpp \
 		include/ProcessInfo.h \
 		include/MyObject.hpp \
+		include/MyMutex.hpp \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/negodrama/Documents/Dashboard/entrega1/Dashboard/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/negodrama/Documents/Dashboard/entrega1/Dashboard -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/SystemCallMemory.hpp -o moc_SystemCallMemory.cpp
@@ -492,6 +495,7 @@ moc_SystemCallProcesses.cpp: include/SystemCallProcesses.hpp \
 		include/SystemCall.hpp \
 		include/ProcessInfo.h \
 		include/MyObject.hpp \
+		include/MyMutex.hpp \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/negodrama/Documents/Dashboard/entrega1/Dashboard/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/negodrama/Documents/Dashboard/entrega1/Dashboard -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/SystemCallProcesses.hpp -o moc_SystemCallProcesses.cpp
@@ -500,6 +504,7 @@ moc_SystemCallDisk.cpp: include/SystemCallDisk.hpp \
 		include/SystemCall.hpp \
 		include/ProcessInfo.h \
 		include/MyObject.hpp \
+		include/MyMutex.hpp \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/negodrama/Documents/Dashboard/entrega1/Dashboard/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/negodrama/Documents/Dashboard/entrega1/Dashboard -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/SystemCallDisk.hpp -o moc_SystemCallDisk.cpp
@@ -508,6 +513,7 @@ moc_SystemCallFiles.cpp: include/SystemCallFiles.hpp \
 		include/SystemCall.hpp \
 		include/ProcessInfo.h \
 		include/MyObject.hpp \
+		include/MyMutex.hpp \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/negodrama/Documents/Dashboard/entrega1/Dashboard/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/negodrama/Documents/Dashboard/entrega1/Dashboard -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/lib/gcc/x86_64-linux-gnu/13/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/SystemCallFiles.hpp -o moc_SystemCallFiles.cpp
@@ -540,6 +546,7 @@ main.o: main.cpp include/mainwindow.h \
 		include/DataProvider.hpp \
 		include/ThreadManager.hpp \
 		include/SystemCall.hpp \
+		include/MyMutex.hpp \
 		include/SystemCallProcesses.hpp \
 		include/SystemCallMemory.hpp \
 		include/SystemCallCPU.hpp \
@@ -549,7 +556,8 @@ main.o: main.cpp include/mainwindow.h \
 
 SystemCall.o: src/SystemCall.cpp include/SystemCall.hpp \
 		include/ProcessInfo.h \
-		include/MyObject.hpp
+		include/MyObject.hpp \
+		include/MyMutex.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SystemCall.o src/SystemCall.cpp
 
 mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
@@ -560,6 +568,7 @@ mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
 		include/SystemCallProcesses.hpp \
 		include/SystemCall.hpp \
 		include/MyMutex.hpp \
+		include/SystemCallMemory.hpp \
 		include/SystemCallDisk.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o src/mainwindow.cpp
 
@@ -575,11 +584,11 @@ DataProvider.o: src/DataProvider.cpp include/DataProvider.hpp \
 		include/ProcessInfo.h \
 		include/SystemCallProcesses.hpp \
 		include/SystemCall.hpp \
+		include/MyMutex.hpp \
 		include/SystemCallMemory.hpp \
 		include/SystemCallCPU.hpp \
 		include/SystemCallDisk.hpp \
-		include/SystemCallFiles.hpp \
-		include/MyMutex.hpp
+		include/SystemCallFiles.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DataProvider.o src/DataProvider.cpp
 
 SystemCallCPU.o: src/SystemCallCPU.cpp include/SystemCallCPU.hpp \
@@ -606,13 +615,15 @@ SystemCallProcesses.o: src/SystemCallProcesses.cpp include/SystemCallProcesses.h
 SystemCallDisk.o: src/SystemCallDisk.cpp include/SystemCallDisk.hpp \
 		include/SystemCall.hpp \
 		include/ProcessInfo.h \
-		include/MyObject.hpp
+		include/MyObject.hpp \
+		include/MyMutex.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SystemCallDisk.o src/SystemCallDisk.cpp
 
 SystemCallFiles.o: src/SystemCallFiles.cpp include/SystemCallFiles.hpp \
 		include/SystemCall.hpp \
 		include/ProcessInfo.h \
-		include/MyObject.hpp
+		include/MyObject.hpp \
+		include/MyMutex.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SystemCallFiles.o src/SystemCallFiles.cpp
 
 Dashboard.o: src/Dashboard.cpp include/Dashboard.hpp \
@@ -621,6 +632,7 @@ Dashboard.o: src/Dashboard.cpp include/Dashboard.hpp \
 		include/DataProvider.hpp \
 		include/ThreadManager.hpp \
 		include/SystemCall.hpp \
+		include/MyMutex.hpp \
 		include/SystemCallProcesses.hpp \
 		include/SystemCallMemory.hpp \
 		include/SystemCallCPU.hpp \

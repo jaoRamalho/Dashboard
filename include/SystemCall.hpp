@@ -23,7 +23,7 @@ protected:
     
 public: 
     SystemCall(QObject* parent = nullptr);
-    ~SystemCall();
+    virtual ~SystemCall();
 
     bool isAccessible() const { return acessible; }
     std::vector<InfoBase*> getInfo();

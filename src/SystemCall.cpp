@@ -13,6 +13,8 @@ SystemCall::SystemCall(QObject* parent) : MyObject(parent){
 SystemCall::~SystemCall(){
     std::cout << "SystemCall destructor called" << std::endl;
     isRunning = false; // Ensure the loops stop
+    for (auto& inst : info) delete inst; // Clear the info vector
+    info.clear(); // Clear the vector
 }
 
 std::vector<InfoBase*> SystemCall::getInfo()
