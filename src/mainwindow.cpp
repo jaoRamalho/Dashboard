@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "include/DataProvider.hpp"
 #include "include/SystemCallProcesses.hpp"
+#include "include/SystemCallMemory.hpp"
 #include "include/MyMutex.hpp"
 #include <QStringListModel> // Adicionado para corrigir o erro de QStringListModel
 
@@ -20,8 +21,9 @@ QStandardItemModel* fileTreeModel = nullptr;
 
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    : QMainWindow(parent), 
+    ui(new Ui::MainWindow),
+    flag(false)
 {
     ui->setupUi(this);
 
@@ -227,7 +229,9 @@ void clearTableWidget(QTableWidget* table) {
 }
 
 void MainWindow::onClickedButtonProcess() {
+    //std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
     setActiveButton(ui->ProcessButton);
+    flag = false; 
     ui->ProcessDataViewA->clear();
     desativeButtons();
     ui->ProcessButton->setChecked(true);
@@ -248,26 +252,58 @@ void MainWindow::onClickedButtonProcess() {
     ui->infor13->setText("Joao R.");
     ui->infor14->setText("Aurelio");
     ui->infor15->setText("Op. Sistems");
+
+    SystemCallProcesses::getInstance()->updateProcesses();
+    const std::vector<InfoBase*>& raw = SystemCallProcesses::getInstance()->getInfo();
+    std::vector<ProcessInfo> processes;
+    for (InfoBase* base : raw) {
+        if (ProcessInfo* process = dynamic_cast<ProcessInfo*>(base)) {
+            processes.push_back(*process);
+        }
+    }
+    onProcessListUpdated(processes);
 }
 
 void MainWindow::onClickedButtonMemory() {
+    //std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de memória
     setActiveButton(ui->MemoryButton);
     ui->ProcessDataViewA->clear();
     desativeButtons();
     ui->MemoryButton->setChecked(true);
     ui->stackedWidgetMain->setCurrentIndex(0);
     fileTreeView->hide();
+
+    SystemCallMemory::getInstance()->updateMemory();
+    const std::vector<InfoBase*>& raw = SystemCallProcesses::getInstance()->getInfo();
+    std::vector<MemoryInfo> memoryList;
+    for (InfoBase* base : raw) {
+        if (MemoryInfo* memory = dynamic_cast<MemoryInfo*>(base)) {
+            memoryList.push_back(*memory); 
+        }
+    }
+    onMemoryListUpdated(memoryList);
 }
 
 void MainWindow::onClickedButtonPerformace() {
+    //std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
     setActiveButton(ui->PerformanceButton);
     ui->ProcessDataViewA->clear();
+    flag = false;
     desativeButtons();
     ui->PerformanceButton->setChecked(true);
     ui->stackedWidgetMain->setCurrentIndex(0);
     fileTreeView->hide();
     clearAllTexts();
 
+    // SystemCallProcesses::getInstance()->updateProcesses();
+    // const std::vector<InfoBase*>& raw = SystemCallProcesses::getInstance()->getInfo();
+    // std::vector<ProcessInfo> processes;
+    // for (InfoBase* base : raw) {
+    //     if (ProcessInfo* process = dynamic_cast<ProcessInfo*>(base)) {
+    //         processes.push_back(*process);
+    //     }
+    // }
+    // onProcessListUpdated(processes);
 }
 
 void MainWindow::onClickedButtonFiles() {
@@ -298,8 +334,6 @@ void MainWindow::onClickedButtonFiles() {
     if (ui->frameContent->layout() && !fileTreeView->parent()) {
         ui->frameContent->layout()->addWidget(fileTreeView);
     }
-
-
 }
 
 void MainWindow::updateGeneralDataPartitions(const std::vector<PartitionInfo> list) {
@@ -330,10 +364,12 @@ void MainWindow::updateGeneralDataPartitions(const std::vector<PartitionInfo> li
 }
 
 void MainWindow::onClickedButtonPartitions() {
+    //std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de partições
     clearAllTexts();
     desativeButtons();
     ui->PartitionsButton->setChecked(true);
     setActiveButton(ui->PartitionsButton);
+    flag = true;
     ui->stackedWidgetMain->setCurrentIndex(0);
     fileTreeView->hide();
     ui->titleA->setText("Partitions Information");
@@ -390,7 +426,7 @@ void MainWindow::updateGeneralDataMemory(const std::vector<MemoryInfo> list) {
 }
 
 void MainWindow::onProcessListUpdated(const std::vector<ProcessInfo> list) {
-    if (list.empty()) {
+    if (list.empty() || flag) {
         return;
     }
 
@@ -551,7 +587,7 @@ void MainWindow::onCPUListUpdated(const std::vector<CPUInfo> list) {
 }
 
 void MainWindow::onDiskListUpdated(const std::vector<PartitionInfo> list) {
-    if (list.empty() || !ui->FilesButton->isChecked()) {
+    if (list.empty() || !ui->FilesButton->isChecked() || !flag) {
         return; // Se a lista estiver vazia ou aba de disco não estiver ativa, não faz nada
     }
 

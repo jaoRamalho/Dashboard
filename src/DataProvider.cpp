@@ -52,7 +52,6 @@ void DataProvider::loop() {
                 }
                 if (!filesList.empty()) {
                     emit filesListUpdated(filesList);
-                    std::cout << "Files List Updated" << std::endl;
                 }
             }
         }
@@ -65,7 +64,6 @@ void DataProvider::loop() {
                 }
                 if (!processList.empty()) {
                     emit processListUpdated(processList);
-                    std::cout << "Process List Updated" << std::endl;
                 }
             }
         }
@@ -78,7 +76,6 @@ void DataProvider::loop() {
                 }
                 if (!diskList.empty()) {
                     emit diskListUpdated(diskList);
-                    std::cout << "Disk List Updated" << std::endl;
                 }
             }
         }
@@ -91,7 +88,6 @@ void DataProvider::loop() {
                 }
                 if (!memoryList.empty()){
                     emit memoryListUpdated(memoryList);
-                    std::cout << "Memory List Updated" << std::endl;
                 }
             }
         }
@@ -104,7 +100,6 @@ void DataProvider::loop() {
                 }
                 if (!cpuList.empty()) {
                     emit cpuListUpdated(cpuList);
-                    std::cout << "CPU List Updated" << std::endl;
                 }
             }
         }

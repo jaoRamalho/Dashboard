@@ -39,7 +39,7 @@ private slots:
     void updateGeneralDataProcess(const std::vector<ProcessInfo>);
     void updateGeneralDataMemory(const std::vector<MemoryInfo>);
     void updateGeneralDataCPU(const std::vector<CPUInfo>);
-    void updateGeneralDataPartitions(const std::vector<PartitionInfo> list);
+    void updateGeneralDataPartitions(const std::vector<PartitionInfo>);
     //void updateGeneralDataDisk(const std::vector<PartitionInfo*>);
     void onClickedButtonPartitions();
     void onClickedButtonProcess();
@@ -57,5 +57,6 @@ private slots:
     void onProcessTableRowClicked(int row);
 private:
     Ui::MainWindow *ui;
+    bool flag;
 };
 #endif // MAINWINDOW_H
