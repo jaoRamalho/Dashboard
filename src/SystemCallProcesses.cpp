@@ -3,6 +3,21 @@
 
 #include <pwd.h> 
 #include <sys/types.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <cstring>
+#include <iostream>
+#include <vector>
+#include <string>
+
+
+void extractRecursos(ProcessInfo& proc);
+std::string parseIPPort(const std::string& hexIPPort);
+std::string parseTCPState(const std::string& hexState);
+std::vector<FileLockInfo> getSystemFileLocks();
 
 SystemCallProcesses* SystemCallProcesses::instance = nullptr;
 SystemCallProcesses::SystemCallProcesses(QObject* parent) : SystemCall(parent) {
@@ -41,12 +56,23 @@ void SystemCallProcesses::updateProcesses() {
     }
     this->info.clear();
     namespace fs = std::filesystem;
+    std::vector<FileLockInfo> fileLocks = getSystemFileLocks(); // Extrai locks de arquivos do sistema
+
+
     for (const auto& entry : fs::directory_iterator("/proc")) {
         if (entry.is_directory()) {
             std::string pid = entry.path().filename().string();
             if (std::all_of(pid.begin(), pid.end(), ::isdigit)) {
                 ProcessInfo* info = new ProcessInfo();
                 info->pid = pid;
+
+                extractRecursos(*info); // Extrai recursos do processo
+                for (const auto& lock : fileLocks) {
+                    if (lock.pid == std::stoi(pid)) {
+                        info->fileLock= lock; // Atribui o lock de arquivo ao processo
+                        break;
+                    }
+                }
 
                 // Ler nome do processo, usuário e memória
                 std::ifstream statusFile(entry.path() / "status");
@@ -151,3 +177,119 @@ void SystemCallProcesses::loop() {
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     }
 }
+
+void extractRecursos(ProcessInfo& proc) {
+    const std::string pid = proc.pid;
+
+    // --- Arquivos abertos ---
+    std::string fdPath = "/proc/" + pid + "/fd";
+    DIR* dir = opendir(fdPath.c_str());
+    if (dir) {
+        struct dirent* entry;
+        while ((entry = readdir(dir)) != nullptr) {
+            if (entry->d_name[0] == '.') continue;
+
+            std::string linkPath = fdPath + "/" + entry->d_name;
+            char buf[PATH_MAX];
+            ssize_t len = readlink(linkPath.c_str(), buf, sizeof(buf)-1);
+            if (len != -1) {
+                buf[len] = '\0';
+                std::string caminho(buf);
+
+                std::string tipo = caminho.find("socket:") != std::string::npos ? "Socket" : "Arquivo";
+                proc.recursos.arquivos.push_back({caminho, tipo});
+            }
+        }
+        closedir(dir);
+    }
+
+    // --- Sockets TCP/UDP/UNIX ---
+    const std::vector<std::pair<std::string, std::string>> socketTypes = {
+        { "tcp", "/proc/" + pid + "/net/tcp" },
+        { "udp", "/proc/" + pid + "/net/udp" },
+        { "unix", "/proc/" + pid + "/net/unix" }
+    };
+
+    for (const auto& [tipo, path] : socketTypes) {
+        std::ifstream file(path);
+        if (!file.is_open()) continue;
+
+        std::string line;
+        std::getline(file, line); // skip header
+
+        while (std::getline(file, line)) {
+            std::istringstream iss(line);
+            std::string local, remote, stateHex;
+            std::string dummy;
+
+            if (tipo == "unix") {
+                std::string type, state, inode, path;
+                iss >> dummy >> type >> state >> dummy >> dummy >> dummy >> inode >> path;
+                proc.recursos.sockets.push_back({ "UNIX", "", path, state });
+            } else {
+                iss >> dummy >> local >> remote >> stateHex;
+                std::string localAddr = parseIPPort(local);
+                std::string remoteAddr = parseIPPort(remote);
+                std::string state = parseTCPState(stateHex);
+                proc.recursos.sockets.push_back({ tipo, localAddr, remoteAddr, state });
+            }
+        }
+    }
+}
+
+std::string parseIPPort(const std::string& hexIPPort) {
+    unsigned int ipPart1, ipPart2, ipPart3, ipPart4, port;
+    sscanf(hexIPPort.c_str(), "%02X%02X%02X%02X:%X", &ipPart4, &ipPart3, &ipPart2, &ipPart1, &port);
+    return std::to_string(ipPart1) + "." + std::to_string(ipPart2) + "." +
+           std::to_string(ipPart3) + "." + std::to_string(ipPart4) + ":" +
+           std::to_string(port);
+}
+
+std::string parseTCPState(const std::string& hexState) {
+    int state;
+    std::stringstream ss;
+    ss << std::hex << hexState;
+    ss >> state;
+
+    switch (state) {
+        case 1: return "ESTABLISHED";
+        case 2: return "SYN_SENT";
+        case 3: return "SYN_RECV";
+        case 4: return "FIN_WAIT1";
+        case 5: return "FIN_WAIT2";
+        case 6: return "TIME_WAIT";
+        case 7: return "CLOSE";
+        case 8: return "CLOSE_WAIT";
+        case 9: return "LAST_ACK";
+        case 10: return "LISTEN";
+        case 11: return "CLOSING";
+        default: return "UNKNOWN";
+    }
+}
+
+std::vector<FileLockInfo> getSystemFileLocks() {
+    std::vector<FileLockInfo> locks;
+    std::ifstream file("/proc/locks");
+    if (!file.is_open()) {
+        return locks;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        FileLockInfo info;
+        char colon;
+        
+        // Exemplo de linha: 
+        // 1: POSIX  ADVISORY  WRITE 13053 103:04:2382608 1073741824 1073742335
+        if (!(iss >> info.id >> colon >> info.tipo >> info.modo >> info.acesso >> info.pid
+                  >> info.dev_inode >> info.faixaInicio >> info.faixaFim)) {
+            continue; // linha mal formatada, ignora
+        }
+
+        locks.push_back(info);
+    }
+
+    return locks;
+}
+

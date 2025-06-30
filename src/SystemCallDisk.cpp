@@ -11,7 +11,9 @@ SystemCallDisk::SystemCallDisk(QObject* parent) : SystemCall(parent){
 
 SystemCallDisk::~SystemCallDisk() {
     std::cout << "SystemCallDisk destructor called" << std::endl;
-    isRunning = false; // Ensure the loops stop
+    isRunning = false;
+    for (auto& inst : info) delete inst;
+    info.clear();
     instance = nullptr; // Clear the singleton instance
 }
 
@@ -21,6 +23,9 @@ SystemCallDisk* SystemCallDisk::getInstance(QObject* parent) {
     }
     return instance;
 }
+
+
+
 
 void SystemCallDisk::updateDiskPartitions() {
     // Limpa info anterior
@@ -91,9 +96,6 @@ void SystemCallDisk::updateDiskPartitions() {
         info.push_back(pi);
     }
 }
-
-
-
 
 void SystemCallDisk::loop() {
     while (isRunning) {

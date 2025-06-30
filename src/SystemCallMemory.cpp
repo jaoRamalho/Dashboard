@@ -12,6 +12,8 @@ SystemCallMemory::SystemCallMemory(QObject* parent) : SystemCall(parent) {
 SystemCallMemory::~SystemCallMemory() {
     std::cout << "SystemCallMemory destructor called" << std::endl;
     isRunning = false; // Ensure the loops stop
+    for (auto& inst : info) delete inst;
+    info.clear();
     instance = nullptr; // Clear the singleton instance
 }
 

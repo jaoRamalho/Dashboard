@@ -17,12 +17,26 @@
 
 
 
+
+void clearTableWidget(QTableWidget* table) {
+    for (int row = 0; row < table->rowCount(); ++row) {
+        for (int col = 0; col < table->columnCount(); ++col) {
+            QTableWidgetItem* item = table->takeItem(row, col);
+            delete item; // Libera a memória do item
+            item = nullptr; // Define o ponteiro como nulo
+        }
+    }
+    table->clearContents(); // Limpa o conteúdo da tabela
+}
+
 QStandardItemModel* fileTreeModel = nullptr;
 
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), 
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow), 
+    activeButton(FlagButton::ButtonFiles),
+    activeButtonChar(FlagButton::ButtonA) // Inicializa activeButtonChar com Button
 {
     ui->setupUi(this);
 
@@ -72,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
 }
 void MainWindow::onClikedButtonA() {
     ui->ProcessDataViewA->clear();
+    activeButtonChar = FlagButton::ButtonA; // Atualiza activeButtonChar
     ui->ButtonA->setChecked(true);
     ui->ButtonB->setChecked(false);
     ui->ButtonC->setChecked(false);
@@ -80,6 +95,7 @@ void MainWindow::onClikedButtonA() {
 }
 void MainWindow::onClikedButtonB() {
     ui->ProcessDataViewA->clear();
+    activeButtonChar = FlagButton::ButtonB; // Atualiza activeButtonChar
     ui->ButtonB->setChecked(true);
     ui->ButtonA->setChecked(false);
     ui->ButtonC->setChecked(false);
@@ -100,11 +116,14 @@ void MainWindow::onClikedButtonB() {
 }
 
 void MainWindow::onClikedButtonC() {
+    // se estiver em processos e pressionar c
+    // ui->stackedWidgetMaster->setCurrentIndex(1);
     ui->ProcessDataViewA->clear();
+    activeButtonChar = FlagButton::ButtonC; // Atualiza activeButtonChar
     ui->ButtonC->setChecked(true);
     ui->ButtonA->setChecked(false);
     ui->ButtonB->setChecked(false);
-    ui->stackedWidgetMaster->setCurrentIndex(0);
+    ui->stackedWidgetMaster->setCurrentIndex(1);
     setActiveButton(ui->ButtonC);
 }
 
@@ -129,7 +148,7 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::onProcessTableRowClicked(int row) {
-    //std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
+    std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
     if (row < 0 || row >= ui->processTable->rowCount() || !update || activeButton != FlagButton::ButtonProcess) {
         return; // Verifica se a linha é válida
     }
@@ -138,93 +157,117 @@ void MainWindow::onProcessTableRowClicked(int row) {
     if (item) {
         QString pid = item->text();
 
+        // Obtém o vetor de ProcessInfo por valor
         std::vector<InfoBase*> baseCopy = SystemCallProcesses::getInstance()->getInfo();
         
         // Obtém o vetor de InfoBase* e converte para ProcessInfo*
-        std::vector<ProcessInfo*> copy;
+        std::vector<ProcessInfo> copy;
         for (InfoBase* base : baseCopy) {
             if (ProcessInfo* process = dynamic_cast<ProcessInfo*>(base)) {
-                copy.push_back(process); // Adiciona ao vetor apenas se for ProcessInfo*
+                copy.push_back(*process); // Adiciona ao vetor apenas se for ProcessInfo*
             }
         }
 
         for (auto& process : copy) {
-            if (!process) {
-                std::cout << "Processo nulo encontrado, pulando..." << std::endl;
-                continue; // Verifica se o ponteiro é válido
-            }
+            if (QString::fromStdString(process.pid) == pid) {
+                if (activeButtonChar == FlagButton::ButtonB) {
+                    // Limpa a tabela de detalhes
+                    if (process.threads.empty()) {
+                        std::cout << "Nenhuma thread encontrada para o processo com PID: " << process.pid << std::endl;
+                        return; // Se não houver threads, não faz nada
+                    }
+                    QStringList headers = {"TID", "Nome", "User", "Memory (KB)", "Switch Context Involuntary", "Switch Context Voluntary", "State"};
+                    clearTableWidget(ui->ProcessDataViewA); // Limpa a tabela antes de preencher
+                    ui->ProcessDataViewA->clearContents();
+                    ui->ProcessDataViewA->clear();
+                    ui->ProcessDataViewA->setRowCount(process.threads.size());
+                    ui->ProcessDataViewA->setColumnCount(7); // Exemplo: PID, Nome
+                    ui->ProcessDataViewA->setHorizontalHeaderLabels(headers);
+                    for (size_t i = 0; i < process.threads.size(); ++i) {
+                        const TreadsInfo& thread = process.threads[i];
+                        ui->ProcessDataViewA->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(thread.tid)));
+                        ui->ProcessDataViewA->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(thread.name)));
+                        ui->ProcessDataViewA->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(thread.user)));
+                        ui->ProcessDataViewA->setItem(i, 3, new QTableWidgetItem(QString::number(thread.memory)));
+                        ui->ProcessDataViewA->setItem(i, 4, new QTableWidgetItem(QString::number(thread.swichContextInvoluntary)));
+                        ui->ProcessDataViewA->setItem(i, 5, new QTableWidgetItem(QString::number(thread.swichContextVoluntary)));
+                        ui->ProcessDataViewA->setItem(i, 6, new QTableWidgetItem(QString::fromStdString(thread.state)));
+                    }
+                    // Preencher labels a partir do índice 12 com informações do processo
+                    QStringList titles = {
+                        "PID", "Nome", "Usuário", "Memória (KB)", "N° Threads",
+                        "Trocas Involuntárias", "Trocas Voluntárias", "Estado",
+                        "Stack Size (KB)", "Heap Size (KB)"
+                    };
 
-            if (QString::fromStdString(process->pid) == pid) {
-                // Limpa a tabela de detalhes
-                if (process->threads.empty()) {
-                    std::cout << "Nenhuma thread encontrada para o processo com PID: " << process->pid << std::endl;
-                    return; // Se não houver threads, não faz nada
-                }
-                QStringList headers = {"TID", "Nome", "User", "Memory (KB)", "Switch Context Involuntary", "Switch Context Voluntary", "State"};
-                ui->ProcessDataViewA->clearContents();
-                ui->ProcessDataViewA->clear();
-                ui->ProcessDataViewA->setRowCount(process->threads.size());
-                ui->ProcessDataViewA->setColumnCount(7); // Exemplo: PID, Nome
-                ui->ProcessDataViewA->setHorizontalHeaderLabels(headers);
+                    QStringList values = {
+                        QString::fromStdString(process.pid),
+                        QString::fromStdString(process.name),
+                        QString::fromStdString(process.user),
+                        QString::number(process.memory),
+                        QString::number(process.threads.size()),
+                        QString::number(process.swichContextInvoluntary),
+                        QString::number(process.swichContextVoluntary),
+                        QString::fromStdString(process.state),
+                        QString::number(process.stackSize),
+                        QString::number(process.heapSize)
+                    };
 
-                for (size_t i = 0; i < process->threads.size(); ++i) {
-                    const TreadsInfo& thread = process->threads[i];
-                    ui->ProcessDataViewA->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(thread.tid)));
-                    ui->ProcessDataViewA->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(thread.name)));
-                    ui->ProcessDataViewA->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(thread.user)));
-                    ui->ProcessDataViewA->setItem(i, 3, new QTableWidgetItem(QString::number(thread.memory)));
-                    ui->ProcessDataViewA->setItem(i, 4, new QTableWidgetItem(QString::number(thread.swichContextInvoluntary)));
-                    ui->ProcessDataViewA->setItem(i, 5, new QTableWidgetItem(QString::number(thread.swichContextVoluntary)));
-                    ui->ProcessDataViewA->setItem(i, 6, new QTableWidgetItem(QString::fromStdString(thread.state)));
-                }
-                // Preencher labels a partir do índice 12 com informações do processo
-                QStringList titles = {
-                    "PID", "Nome", "Usuário", "Memória (KB)", "N° Threads",
-                    "Trocas Involuntárias", "Trocas Voluntárias", "Estado",
-                    "Stack Size (KB)", "Heap Size (KB)"
-                };
+                    for (int i = 0; i < titles.size(); ++i) {
+                        QLabel* titleLabel = findChild<QLabel*>("inforTitle" + QString::number(i + 12));
+                        QLabel* valueLabel = findChild<QLabel*>("infor" + QString::number(i + 12));
+                        
+                        if (titleLabel && valueLabel) {
+                            titleLabel->setText(titles[i]);
+                            valueLabel->setText(values[i]);
 
-                QStringList values = {
-                    QString::fromStdString(process->pid),
-                    QString::fromStdString(process->name),
-                    QString::fromStdString(process->user),
-                    QString::number(process->memory),
-                    QString::number(process->threads.size()),
-                    QString::number(process->swichContextInvoluntary),
-                    QString::number(process->swichContextVoluntary),
-                    QString::fromStdString(process->state),
-                    QString::number(process->stackSize),
-                    QString::number(process->heapSize)
-                };
+                            titleLabel->adjustSize();
+                            valueLabel->adjustSize();
+                        }
+                    }
 
-                for (int i = 0; i < titles.size(); ++i) {
-                    QLabel* titleLabel = findChild<QLabel*>("inforTitle" + QString::number(i + 12));
-                    QLabel* valueLabel = findChild<QLabel*>("infor" + QString::number(i + 12));
-                    
-                    if (titleLabel && valueLabel) {
-                        titleLabel->setText(titles[i]);
-                        valueLabel->setText(values[i]);
-
-                        titleLabel->adjustSize();
-                        valueLabel->adjustSize();
+                    break; // Encerra o loop após encontrar o processo
+                } else if (activeButtonChar == FlagButton::ButtonC) {
+                    std::cout << "Exibindo informações dos recursos do processo com PID: " << process.pid << std::endl;
+                    // Exibir informações dos recursos do processo
+                    const Recursos recursos = process.recursos;
+                    int nFiles = recursos.arquivos.size();
+                    int nSockets = recursos.sockets.size();
+                    int totalRows = nFiles + nSockets;
+                    QStringList headers = {"Tipo", "Caminho/Endereço Local", "Endereço Remoto", "Estado", "ID Lock Kernel", "Tipo Lock", "Faixa inicio", "Faixa Fim", "Acesso", "Modo"};
+                    clearTableWidget(ui->ProcessDataViewA); // Limpa a tabela antes de preencher
+                    ui->ProcessDataViewA->clearContents();
+                    ui->ProcessDataViewA->clear();
+                    ui->ProcessDataViewA->setRowCount(totalRows);
+                    ui->ProcessDataViewA->setColumnCount(10);
+                    ui->ProcessDataViewA->setHorizontalHeaderLabels(headers);
+                    int row = 0;
+                    // Arquivos abertos
+                    for (const ArquivoAberto& arq : recursos.arquivos) {
+                        ui->ProcessDataViewA->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(arq.tipo)));
+                        ui->ProcessDataViewA->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(arq.caminho)));
+                        ui->ProcessDataViewA->setItem(row, 2, new QTableWidgetItem("-"));
+                        ui->ProcessDataViewA->setItem(row, 3, new QTableWidgetItem("-"));
+                        ui->ProcessDataViewA->setItem(row, 4, new QTableWidgetItem(QString::number(process.fileLock.id)));
+                        ui->ProcessDataViewA->setItem(row, 5, new QTableWidgetItem(QString::fromStdString(process.fileLock.tipo)));
+                        ui->ProcessDataViewA->setItem(row, 6, new QTableWidgetItem(QString::fromStdString(process.fileLock.faixaInicio)));
+                        ui->ProcessDataViewA->setItem(row, 7, new QTableWidgetItem(QString::fromStdString(process.fileLock.faixaFim)));
+                        ui->ProcessDataViewA->setItem(row, 8, new QTableWidgetItem(QString::fromStdString(process.fileLock.acesso)));
+                        ui->ProcessDataViewA->setItem(row, 9, new QTableWidgetItem(QString::fromStdString(process.fileLock.modo))); 
+                        ++row;
+                    }
+                    // Sockets
+                    for (const SocketInfo& sock : recursos.sockets) {
+                        ui->ProcessDataViewA->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(sock.tipo)));
+                        ui->ProcessDataViewA->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(sock.localAddress)));
+                        ui->ProcessDataViewA->setItem(row, 2, new QTableWidgetItem(QString::fromStdString(sock.remoteAddress)));
+                        ui->ProcessDataViewA->setItem(row, 3, new QTableWidgetItem(QString::fromStdString(sock.state)));
+                        ++row;
                     }
                 }
-
-                break; // Encerra o loop após encontrar o processo
             }
         }
     }
-}
-
-void clearTableWidget(QTableWidget* table) {
-    for (int row = 0; row < table->rowCount(); ++row) {
-        for (int col = 0; col < table->columnCount(); ++col) {
-            QTableWidgetItem* item = table->takeItem(row, col);
-            delete item; // Libera a memória do item
-            item = nullptr; // Define o ponteiro como nulo
-        }
-    }
-    table->clearContents(); // Limpa o conteúdo da tabela
 }
 
 void MainWindow::onClickedButtonProcess() {
@@ -494,7 +537,7 @@ void MainWindow::updateGeneralDataMemory(const std::vector<MemoryInfo> list) {
 }
 
 void MainWindow::onProcessListUpdated(const std::vector<ProcessInfo> list) {
-    if (list.empty() || activeButton != FlagButton::ButtonProcess) {
+    if (list.empty() || activeButton != FlagButton::ButtonProcess ) {
         return;
     }
 
@@ -580,14 +623,15 @@ void MainWindow::onProcessListUpdated(const std::vector<ProcessInfo> list) {
     QLabel* titleLabel = findChild<QLabel*>("inforTitle" + QString::number(i));
     QLabel* valueLabel = findChild<QLabel*>("infor" + QString::number(i));
 
-    if (titleLabel && valueLabel) {
-        titleLabel->setText(titles[i]);
-        titleLabel->adjustSize();
+        if (titleLabel && valueLabel) {
+            titleLabel->setText(titles[i]);
+            titleLabel->adjustSize();
 
-        valueLabel->setText(values[i]);
-        valueLabel->adjustSize();
+            valueLabel->setText(values[i]);
+            valueLabel->adjustSize();
+        }
     }
-}
+
 
 }
 

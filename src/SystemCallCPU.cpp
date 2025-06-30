@@ -11,7 +11,9 @@ SystemCallCPU::SystemCallCPU(QObject* parent) : SystemCall(parent){
 
 SystemCallCPU::~SystemCallCPU() {
     std::cout << "SystemCallCPU destructor called" << std::endl;
-    isRunning = false; // Ensure the loops stop
+    isRunning = false;
+    for (auto& inst : info) delete inst;
+    info.clear();
     instance = nullptr; // Clear the singleton instance
 }
 

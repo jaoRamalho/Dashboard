@@ -70,5 +70,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
     FlagButton activeButton;
+    FlagButton activeButtonChar;
 };
 #endif // MAINWINDOW_H

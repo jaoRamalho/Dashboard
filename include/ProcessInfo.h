@@ -11,6 +11,34 @@ struct InfoBase {
     virtual ~InfoBase() = default; 
 };
 
+struct ArquivoAberto {
+    std::string caminho;
+    std::string tipo;
+};
+
+struct FileLockInfo {
+    int id;                        // ID do lock no kernel
+    std::string tipo;              // POSIX, FLOCK, etc.
+    std::string modo;              // ADVISORY, MANDATORY (geralmente ADVISORY)
+    std::string acesso;            // WRITE ou READ
+    int pid;                       // PID do processo que segurou o lock
+    std::string dev_inode;        // dispositivo:major:minor:inode
+    std::string faixaInicio;      // Byte inicial do lock
+    std::string faixaFim;         // Byte final do lock
+};
+
+struct SocketInfo {
+    std::string tipo; // TCP, UDP, UNIX
+    std::string localAddress;
+    std::string remoteAddress;
+    std::string state;
+};
+
+struct Recursos {
+    std::vector<SocketInfo> sockets;
+    std::vector<ArquivoAberto> arquivos;
+};
+
 // Structs de Informacao
 /// Informacao de Threads
 struct TreadsInfo : public InfoBase {
@@ -37,7 +65,10 @@ struct ProcessInfo : public InfoBase {
     std::string state;
     unsigned long stackSize;
     unsigned long heapSize;
+    Recursos recursos;
+    FileLockInfo fileLock;
 };
+
 
 /// Informacao de CPU
 struct CPUInfo : public InfoBase {

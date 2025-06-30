@@ -58,9 +58,11 @@ void DataProvider::loop() {
         if (sysCallProcesses != nullptr){
             std::lock_guard<std::mutex> lock(globalMutex);
             if(sysCallProcesses->isAccessible()) {
-                for (auto& base : sysCallProcesses->getInfo()) {
-                    ProcessInfo* p = dynamic_cast<ProcessInfo*>(base);
-                    if (p) processList.push_back(*p);
+                for (const auto& p : sysCallProcesses->getInfo()) {
+                    ProcessInfo* process = dynamic_cast<ProcessInfo*>(p);
+                    if (process) {
+                        processList.push_back(*process);
+                    }
                 }
                 if (!processList.empty()) {
                     emit processListUpdated(processList);
