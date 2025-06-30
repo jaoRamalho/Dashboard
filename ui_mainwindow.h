@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.15.15
+** Created by: Qt User Interface Compiler version 5.15.13
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -93,8 +93,21 @@ public:
     QVBoxLayout *verticalLayout_8;
     QLabel *inforTitle11;
     QLabel *infor11;
+    QHBoxLayout *horizontalLayout_8;
+    QVBoxLayout *verticalLayout_22;
+    QLabel *inforTitle102;
+    QLabel *infor102;
+    QVBoxLayout *verticalLayout_25;
+    QLabel *inforTitle103;
+    QLabel *infor103;
+    QVBoxLayout *verticalLayout_26;
+    QLabel *inforTitle104;
+    QLabel *infor104;
+    QVBoxLayout *verticalLayout_27;
+    QLabel *inforTitle105;
+    QLabel *infor105;
     QFrame *frame_2;
-    QWidget *widget;
+    QWidget *layoutWidget2;
     QVBoxLayout *verticalLayout_20;
     QHBoxLayout *horizontalLayout_4;
     QPushButton *ButtonA;
@@ -146,10 +159,6 @@ public:
     QWidget *page_4;
     QVBoxLayout *verticalLayout_21;
     QTableWidget *ProcessDataViewA;
-    QFrame *frame_3;
-    QWidget *layoutWidget2;
-    QVBoxLayout *verticalLayout_25;
-    QTableWidget *GeneralDataView;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -157,7 +166,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(1612, 764);
+        MainWindow->resize(1113, 764);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout_7 = new QHBoxLayout(centralwidget);
@@ -282,7 +291,7 @@ public:
         frame1->setFrameShadow(QFrame::Raised);
         layoutWidget1 = new QWidget(frame1);
         layoutWidget1->setObjectName(QString::fromUtf8("layoutWidget1"));
-        layoutWidget1->setGeometry(QRect(20, 20, 571, 192));
+        layoutWidget1->setGeometry(QRect(20, 20, 572, 271));
         verticalLayout_9 = new QVBoxLayout(layoutWidget1);
         verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
         verticalLayout_9->setSizeConstraint(QLayout::SetMaximumSize);
@@ -511,6 +520,76 @@ public:
 
         verticalLayout_9->addLayout(horizontalLayout_3);
 
+        horizontalLayout_8 = new QHBoxLayout();
+        horizontalLayout_8->setSpacing(10);
+        horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
+        verticalLayout_22 = new QVBoxLayout();
+        verticalLayout_22->setObjectName(QString::fromUtf8("verticalLayout_22"));
+        inforTitle102 = new QLabel(layoutWidget1);
+        inforTitle102->setObjectName(QString::fromUtf8("inforTitle102"));
+        inforTitle102->setFont(font);
+
+        verticalLayout_22->addWidget(inforTitle102);
+
+        infor102 = new QLabel(layoutWidget1);
+        infor102->setObjectName(QString::fromUtf8("infor102"));
+
+        verticalLayout_22->addWidget(infor102);
+
+
+        horizontalLayout_8->addLayout(verticalLayout_22);
+
+        verticalLayout_25 = new QVBoxLayout();
+        verticalLayout_25->setObjectName(QString::fromUtf8("verticalLayout_25"));
+        inforTitle103 = new QLabel(layoutWidget1);
+        inforTitle103->setObjectName(QString::fromUtf8("inforTitle103"));
+        inforTitle103->setFont(font);
+
+        verticalLayout_25->addWidget(inforTitle103);
+
+        infor103 = new QLabel(layoutWidget1);
+        infor103->setObjectName(QString::fromUtf8("infor103"));
+
+        verticalLayout_25->addWidget(infor103);
+
+
+        horizontalLayout_8->addLayout(verticalLayout_25);
+
+        verticalLayout_26 = new QVBoxLayout();
+        verticalLayout_26->setObjectName(QString::fromUtf8("verticalLayout_26"));
+        inforTitle104 = new QLabel(layoutWidget1);
+        inforTitle104->setObjectName(QString::fromUtf8("inforTitle104"));
+        inforTitle104->setFont(font);
+
+        verticalLayout_26->addWidget(inforTitle104);
+
+        infor104 = new QLabel(layoutWidget1);
+        infor104->setObjectName(QString::fromUtf8("infor104"));
+
+        verticalLayout_26->addWidget(infor104);
+
+
+        horizontalLayout_8->addLayout(verticalLayout_26);
+
+        verticalLayout_27 = new QVBoxLayout();
+        verticalLayout_27->setObjectName(QString::fromUtf8("verticalLayout_27"));
+        inforTitle105 = new QLabel(layoutWidget1);
+        inforTitle105->setObjectName(QString::fromUtf8("inforTitle105"));
+        inforTitle105->setFont(font);
+
+        verticalLayout_27->addWidget(inforTitle105);
+
+        infor105 = new QLabel(layoutWidget1);
+        infor105->setObjectName(QString::fromUtf8("infor105"));
+
+        verticalLayout_27->addWidget(infor105);
+
+
+        horizontalLayout_8->addLayout(verticalLayout_27);
+
+
+        verticalLayout_9->addLayout(horizontalLayout_8);
+
 
         verticalLayout_23->addWidget(frame1);
 
@@ -524,16 +603,16 @@ public:
 "border-radius: 16px;"));
         frame_2->setFrameShape(QFrame::StyledPanel);
         frame_2->setFrameShadow(QFrame::Raised);
-        widget = new QWidget(frame_2);
-        widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setGeometry(QRect(10, 10, 581, 261));
-        verticalLayout_20 = new QVBoxLayout(widget);
+        layoutWidget2 = new QWidget(frame_2);
+        layoutWidget2->setObjectName(QString::fromUtf8("layoutWidget2"));
+        layoutWidget2->setGeometry(QRect(10, 10, 581, 261));
+        verticalLayout_20 = new QVBoxLayout(layoutWidget2);
         verticalLayout_20->setObjectName(QString::fromUtf8("verticalLayout_20"));
         verticalLayout_20->setSizeConstraint(QLayout::SetMaximumSize);
         verticalLayout_20->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
-        ButtonA = new QPushButton(widget);
+        ButtonA = new QPushButton(layoutWidget2);
         ButtonA->setObjectName(QString::fromUtf8("ButtonA"));
         ButtonA->setMinimumSize(QSize(90, 40));
         ButtonA->setFont(font);
@@ -543,7 +622,7 @@ public:
 
         horizontalLayout_4->addWidget(ButtonA);
 
-        ButtonB = new QPushButton(widget);
+        ButtonB = new QPushButton(layoutWidget2);
         ButtonB->setObjectName(QString::fromUtf8("ButtonB"));
         ButtonB->setMinimumSize(QSize(120, 40));
         ButtonB->setFont(font);
@@ -553,7 +632,7 @@ public:
 
         horizontalLayout_4->addWidget(ButtonB);
 
-        ButtonC = new QPushButton(widget);
+        ButtonC = new QPushButton(layoutWidget2);
         ButtonC->setObjectName(QString::fromUtf8("ButtonC"));
         ButtonC->setMinimumSize(QSize(100, 40));
         ButtonC->setFont(font);
@@ -566,7 +645,7 @@ public:
 
         verticalLayout_20->addLayout(horizontalLayout_4);
 
-        stackedWidgetMaster = new QStackedWidget(widget);
+        stackedWidgetMaster = new QStackedWidget(layoutWidget2);
         stackedWidgetMaster->setObjectName(QString::fromUtf8("stackedWidgetMaster"));
         page_3 = new QWidget();
         page_3->setObjectName(QString::fromUtf8("page_3"));
@@ -804,29 +883,10 @@ public:
 
         horizontalLayout_7->addLayout(verticalLayout_23);
 
-        frame_3 = new QFrame(centralwidget);
-        frame_3->setObjectName(QString::fromUtf8("frame_3"));
-        frame_3->setMinimumSize(QSize(420, 610));
-        frame_3->setFrameShape(QFrame::StyledPanel);
-        frame_3->setFrameShadow(QFrame::Raised);
-        layoutWidget2 = new QWidget(frame_3);
-        layoutWidget2->setObjectName(QString::fromUtf8("layoutWidget2"));
-        layoutWidget2->setGeometry(QRect(7, 10, 401, 591));
-        verticalLayout_25 = new QVBoxLayout(layoutWidget2);
-        verticalLayout_25->setObjectName(QString::fromUtf8("verticalLayout_25"));
-        verticalLayout_25->setContentsMargins(0, 0, 0, 0);
-        GeneralDataView = new QTableWidget(layoutWidget2);
-        GeneralDataView->setObjectName(QString::fromUtf8("GeneralDataView"));
-
-        verticalLayout_25->addWidget(GeneralDataView);
-
-
-        horizontalLayout_7->addWidget(frame_3);
-
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1612, 24));
+        menubar->setGeometry(QRect(0, 0, 1113, 24));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
@@ -834,7 +894,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        stackedWidgetMain->setCurrentIndex(1);
+        stackedWidgetMain->setCurrentIndex(0);
         stackedWidgetMaster->setCurrentIndex(1);
 
 
@@ -874,6 +934,14 @@ public:
         infor10->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
         inforTitle11->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
         infor11->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        inforTitle102->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        infor102->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        inforTitle103->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        infor103->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        inforTitle104->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        infor104->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        inforTitle105->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        infor105->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
         ButtonA->setText(QCoreApplication::translate("MainWindow", "General", nullptr));
         ButtonB->setText(QCoreApplication::translate("MainWindow", "Threads", nullptr));
         ButtonC->setText(QCoreApplication::translate("MainWindow", "Resources", nullptr));

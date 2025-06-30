@@ -31,7 +31,6 @@ DataProvider* DataProvider::getInstance(QObject* parent) {
 
 void DataProvider::loop() {
     while (isRunning) {
-        std::lock_guard<std::mutex> lock(globalMutex);
         SystemCallCPU* sysCallCPU = SystemCallCPU::getInstance();
         SystemCallMemory* sysCallMemory = SystemCallMemory::getInstance();
         SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
@@ -57,6 +56,7 @@ void DataProvider::loop() {
         }
         
         if (sysCallProcesses != nullptr){
+            std::lock_guard<std::mutex> lock(globalMutex);
             if(sysCallProcesses->isAccessible()) {
                 for (auto& base : sysCallProcesses->getInfo()) {
                     ProcessInfo* p = dynamic_cast<ProcessInfo*>(base);
@@ -69,6 +69,7 @@ void DataProvider::loop() {
         }
 
         if (sysCallDisk != nullptr){
+            std::lock_guard<std::mutex> lock(globalMutex);
             if(sysCallDisk->isAccessible()) {
                 for (auto& base : sysCallDisk->getInfo()) {
                     PartitionInfo* p = dynamic_cast<PartitionInfo*>(base);
@@ -81,6 +82,7 @@ void DataProvider::loop() {
         }
 
         if(sysCallMemory != nullptr){
+            std::lock_guard<std::mutex> lock(globalMutex);
             if (sysCallMemory->isAccessible()){
                 for (auto& base : sysCallMemory->getInfo()) {
                     MemoryInfo* m = dynamic_cast<MemoryInfo*>(base);
@@ -93,6 +95,7 @@ void DataProvider::loop() {
         }
 
         if (sysCallCPU != nullptr){
+            std::lock_guard<std::mutex> lock(globalMutex);
             if (sysCallCPU->isAccessible()){
                 for (auto& base : sysCallCPU->getInfo()) {
                     CPUInfo* c = dynamic_cast<CPUInfo*>(base);

@@ -11,6 +11,18 @@
 #include <QStandardItemModel>
 #include <QPushButton>
 
+
+enum FlagButton {
+    ButtonProcess,
+    ButtonMemory,
+    ButtonPerformance,
+    ButtonFiles,
+    ButtonPartitions,
+    ButtonA,
+    ButtonB,
+    ButtonC
+};
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -57,6 +69,6 @@ private slots:
     void onProcessTableRowClicked(int row);
 private:
     Ui::MainWindow *ui;
-    bool flag;
+    FlagButton activeButton;
 };
 #endif // MAINWINDOW_H

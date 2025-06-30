@@ -21,57 +21,44 @@ SystemCallDisk* SystemCallDisk::getInstance(QObject* parent) {
     }
     return instance;
 }
-void SystemCallDisk::updateDiskPartitions() {
-    //std::lock_guard<std::mutex> lock(globalMutex);
 
-    // Limpa as informações antigas
-    for (auto& inst : info) {
-        delete inst; // Limpa a memória dos objetos anteriores
-    }
+void SystemCallDisk::updateDiskPartitions() {
+    for (auto& inst : info) delete inst;
     info.clear();
 
-    std::ifstream mountsFile("/proc/mounts");
-    if (!mountsFile.is_open()) return;
+    std::ifstream partitionsFile("/proc/partitions");
+    if (!partitionsFile.is_open()) return;
 
     std::string line;
-    while (std::getline(mountsFile, line)) {
+    std::getline(partitionsFile, line); // ignora cabeçalho
+    std::getline(partitionsFile, line); // ignora cabeçalho
+
+    while (std::getline(partitionsFile, line)) {
         std::istringstream iss(line);
-        std::string device, mountPoint, fsType;
-        if (!(iss >> device >> mountPoint >> fsType)) continue;
+        int major, minor;
+        unsigned long blocks;
+        std::string name;
 
-        PartitionInfo* part = new PartitionInfo();
-        part->device = device;
-        part->mountPoint = mountPoint;
-        part->filesystemType = fsType;
+        if (!(iss >> major >> minor >> blocks >> name)) continue;
 
-        struct statvfs stat;
-        if (statvfs(mountPoint.c_str(), &stat) == 0) {
-            unsigned long blockSize = stat.f_frsize;
-            unsigned long total = stat.f_blocks * blockSize;
+        // Ignora dispositivos base (ex: sda), queremos só partições (ex: sda1)
+        if (isdigit(name.back()) == 0 && name.find("nvme") == std::string::npos)
+            continue;
 
-            if (total == 0) {
-                delete part;
-                continue; // Ignora partições de tamanho zero
-            }
+        auto* pi = new PartitionInfo();
+        pi->device = "/dev/" + name;
+        pi->totalSize = blocks * 1024UL;
+        pi->usedSize = 0;
+        pi->availableSize = 0;
+        pi->usagePercentage = 0.0f;
+        pi->isMounted = false;
 
-            unsigned long free = stat.f_bfree * blockSize;
-            unsigned long avail = stat.f_bavail * blockSize;
-            unsigned long used = total - free;
+        pi->mountPoint = "";
+        pi->filesystemType = "";
 
-            part->totalSize = total;
-            part->usedSize = used;
-            part->availableSize = avail;
-            part->usagePercentage = (float)used / total * 100.0f;
-            part->isMounted = true;
-        } else {
-            delete part;
-            continue; // Ignora partições que não puderam ser medidas
-        }
-
-        info.push_back(part);
+        info.push_back(pi);
     }
 }
-
 
 
 
