@@ -265,6 +265,7 @@ void MainWindow::onClickedButtonProcess() {
 
 void MainWindow::onClickedButtonMemory() {
     setActiveButton(ui->MemoryButton);
+    clearAllTexts();
     activeButton = FlagButton::ButtonMemory; // Define o botão ativo como Memory
     ui->ProcessDataViewA->clear();
     desativeButtons();
@@ -360,7 +361,11 @@ void MainWindow::updateGeneralDataPartitions(const std::vector<PartitionInfo> li
         quint64 used = p.usedSize;
         quint64 available = p.availableSize;
 
-        totalDiskBytes += total;
+        std::cout << "D: " << p.device << std::endl;
+        if (p.device == "/dev/nvme0n1" || p.device == "/dev/nvmme0n1p1" || p.device == "/dev/nvmme0n1p2" ||
+        p.device == "/dev/nvmme0n1p3" || p.device == "/dev/nvmme0n1p4" || p.device == "/dev/nvmme0n1p5") {
+            totalDiskBytes += total;
+        }
         usedDiskBytes += used;
         availableDiskBytes += available;
         totalUsagePercentage += p.usagePercentage;
