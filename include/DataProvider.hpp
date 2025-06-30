@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <string>
+#include <optional>
 
 
 class DataProvider : public MyObject{
@@ -29,7 +30,7 @@ signals:
     void diskListUpdated(const std::vector<PartitionInfo>&);
     void filesListUpdated(const std::vector<FileSystemNode>&);
 public:
-    const ProcessInfo getProcessByPID(const std::string& pid) const;
+    const std::optional<ProcessInfo> getProcessByPID(const std::string& pid) const;
 };
 
 #endif // DATAPROVIDER_HPP

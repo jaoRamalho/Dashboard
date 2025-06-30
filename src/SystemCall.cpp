@@ -13,15 +13,10 @@ SystemCall::SystemCall(QObject* parent) : MyObject(parent){
 SystemCall::~SystemCall(){
     std::cout << "SystemCall destructor called" << std::endl;
     isRunning = false; // Ensure the loops stop
-    for (auto& inst : info) delete inst; // Clear the info vector
-    info.clear(); // Clear the vector
+    info.clear(); // unique_ptr limpa automaticamente
 }
 
-std::vector<InfoBase*> SystemCall::getInfo()
+const std::vector<std::unique_ptr<InfoBase>>& SystemCall::getInfo() const
 {
-    //std::lock_guard<std::mutex> lock(globalMutex);
-    if(info.size() > 0){
-        return info;
-    }
-    return std::vector<InfoBase*>();
+    return info;
 }

@@ -46,9 +46,9 @@ void DataProvider::loop() {
         if (sysCallFiles != nullptr){
             if(sysCallFiles->isAccessible()) {
                 std::lock_guard<std::mutex> lock(globalMutex);
-                std::vector<InfoBase*> fileInfo = sysCallFiles->getInfo();
-                for (auto& base : fileInfo) {
-                    FileSystemNode* p = dynamic_cast<FileSystemNode*>(base);
+                const auto& fileInfo = sysCallFiles->getInfo();
+                for (const auto& base : fileInfo) {
+                    FileSystemNode* p = dynamic_cast<FileSystemNode*>(base.get());
                     if (p) filesList.push_back(*p);
                 }
                 if (!filesList.empty()) {
@@ -60,9 +60,9 @@ void DataProvider::loop() {
         if (sysCallProcesses != nullptr){
             if(sysCallProcesses->isAccessible()) {
                 std::lock_guard<std::mutex> lock(globalMutex);
-                std::vector<InfoBase*> processInfo = sysCallProcesses->getInfo();
+                const auto& processInfo = sysCallProcesses->getInfo();
                 for (const auto& p : processInfo) {
-                    ProcessInfo* process = dynamic_cast<ProcessInfo*>(p);
+                    ProcessInfo* process = dynamic_cast<ProcessInfo*>(p.get());
                     if (process) {
                         processList.push_back(*process);
                     }
@@ -76,9 +76,9 @@ void DataProvider::loop() {
         if (sysCallDisk != nullptr){
             if(sysCallDisk->isAccessible()) {
                 std::lock_guard<std::mutex> lock(globalMutex);
-                std::vector<InfoBase*> diskInfo = sysCallDisk->getInfo();
-                for (auto& base : diskInfo) {
-                    PartitionInfo* p = dynamic_cast<PartitionInfo*>(base);
+                const auto& diskInfo = sysCallDisk->getInfo();
+                for (const auto& base : diskInfo) {
+                    PartitionInfo* p = dynamic_cast<PartitionInfo*>(base.get());
                     if (p) diskList.push_back(*p);
                 }
                 if (!diskList.empty()) {
@@ -90,9 +90,9 @@ void DataProvider::loop() {
         if(sysCallMemory != nullptr){
             if (sysCallMemory->isAccessible()){
                 std::lock_guard<std::mutex> lock(globalMutex);
-                std::vector<InfoBase*> memoryInfo = sysCallMemory->getInfo();
-                for (auto& base : memoryInfo) {
-                    MemoryInfo* m = dynamic_cast<MemoryInfo*>(base);
+                const auto& memoryInfo = sysCallMemory->getInfo();
+                for (const auto& base : memoryInfo) {
+                    MemoryInfo* m = dynamic_cast<MemoryInfo*>(base.get());
                     if (m) memoryList.push_back(*m);
                 }
                 if (!memoryList.empty()){
@@ -104,11 +104,11 @@ void DataProvider::loop() {
         if (sysCallCPU != nullptr){
             if (sysCallCPU->isAccessible()){
                 std::lock_guard<std::mutex> lock(globalMutex);
-                for (auto& base : sysCallCPU->getInfo()) {
-                    CPUInfo* c = dynamic_cast<CPUInfo*>(base);
+                for (const auto& base : sysCallCPU->getInfo()) {
+                    CPUInfo* c = dynamic_cast<CPUInfo*>(base.get());
                     if (c) cpuList.push_back(*c);
                 }
-                if (!cpuList.empty()) {
+                if (!cpuList.empty()){
                     emit cpuListUpdated(cpuList);
                 }
             }
@@ -118,15 +118,15 @@ void DataProvider::loop() {
     }
 }
 
-const ProcessInfo DataProvider::getProcessByPID(const std::string& pid) const {
+const std::optional<ProcessInfo> DataProvider::getProcessByPID(const std::string& pid) const {
     SystemCallProcesses* sysCallProcesses = SystemCallProcesses::getInstance();
     if (!sysCallProcesses->isAccessible()) return ProcessInfo();
     std::lock_guard<std::mutex> lock(globalMutex);
-    std::vector<InfoBase*> processInfo = sysCallProcesses->getInfo();
-    for (auto& base : processInfo) {
-        ProcessInfo process = *dynamic_cast<ProcessInfo*>(base);
-        if (process.pid == pid) {
-            return process;
+    const auto& processInfo = sysCallProcesses->getInfo();
+    for (const auto& base : processInfo) {
+        ProcessInfo* process = dynamic_cast<ProcessInfo*>(base.get());
+        if (process && process->pid == pid) {
+            return *process;
         }
     }
     return ProcessInfo(); // Return an empty ProcessInfo if not found

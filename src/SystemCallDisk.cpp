@@ -12,8 +12,7 @@ SystemCallDisk::SystemCallDisk(QObject* parent) : SystemCall(parent){
 SystemCallDisk::~SystemCallDisk() {
     std::cout << "SystemCallDisk destructor called" << std::endl;
     isRunning = false;
-    for (auto& inst : info) delete inst;
-    info.clear();
+    info.clear(); // unique_ptr limpa automaticamente
 }
 
 SystemCallDisk* SystemCallDisk::getInstance(QObject* parent) {
@@ -28,7 +27,6 @@ SystemCallDisk* SystemCallDisk::getInstance(QObject* parent) {
 
 void SystemCallDisk::updateDiskPartitions() {
     // Limpa info anterior
-    for (auto& inst : info) delete inst;
     info.clear();
 
     std::ifstream partitionsFile("/proc/partitions");
@@ -67,7 +65,7 @@ void SystemCallDisk::updateDiskPartitions() {
         if (isdigit(name.back()) == 0 && name.find("nvme") == std::string::npos)
             continue;
 
-        auto* pi = new PartitionInfo();
+        auto pi = std::make_unique<PartitionInfo>();
         pi->device = "/dev/" + name;
         pi->totalSize = blocks * 1024UL;
         pi->usedSize = 0;
@@ -92,7 +90,7 @@ void SystemCallDisk::updateDiskPartitions() {
             }
         }
 
-        info.push_back(pi);
+        info.push_back(std::move(pi));
     }
 }
 

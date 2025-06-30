@@ -28,13 +28,9 @@ SystemCallProcesses::SystemCallProcesses(QObject* parent) : SystemCall(parent) {
 
 SystemCallProcesses::~SystemCallProcesses() {
     std::cout << "SystemCallProcesses destructor called" << std::endl;
-    isRunning = false; // Ensure the loops stop
-    instance = nullptr; // Clear the singleton instance
-    for (auto& inst : info) {
-        delete inst; // Limpa a memória dos objetos anteriores
-    }
-    info.clear(); // Limpa o vetor de informações
-    
+    isRunning = false;
+    instance = nullptr;
+    info.clear(); // unique_ptr limpa automaticamente
 }
 
 SystemCallProcesses* SystemCallProcesses::getInstance(QObject* parent) {
@@ -56,26 +52,22 @@ std::vector<std::string> getThreadIDs(const std::string& pid) {
 
 void SystemCallProcesses::updateProcesses() {
     //std::lock_guard<std::mutex> lock(globalMutex);
-    for (auto& inst : info) {
-        delete inst; // Limpa a memória dos objetos anteriores
-    }
-
-    this->info.clear();
+    info.clear();
     namespace fs = std::filesystem;
     std::vector<FileLockInfo> fileLocks = getSystemFileLocks(); // Extrai locks de arquivos do sistema
-
 
     for (const auto& entry : fs::directory_iterator("/proc")) {
         if (entry.is_directory()) {
             std::string pid = entry.path().filename().string();
             if (std::all_of(pid.begin(), pid.end(), ::isdigit)) {
-                ProcessInfo* info = new ProcessInfo();
-                info->pid = pid;
+                auto infoPtr = std::make_unique<ProcessInfo>();
+                ProcessInfo& info = *infoPtr;
+                info.pid = pid;
 
-                extractRecursos(*info); // Extrai recursos do processo
+                extractRecursos(info); // Extrai recursos do processo
                 for (const auto& lock : fileLocks) {
                     if (lock.pid == std::stoi(pid)) {
-                        info->fileLock= lock; // Atribui o lock de arquivo ao processo
+                        info.fileLock= lock; // Atribui o lock de arquivo ao processo
                         break;
                     }
                 }
@@ -85,39 +77,39 @@ void SystemCallProcesses::updateProcesses() {
                 std::string line;
                 while (std::getline(statusFile, line)) {
                     if (line.rfind("Name:", 0) == 0) {
-                        info->name = line.substr(6);
-                        info->name.erase(0, info->name.find_first_not_of(" \t"));
+                        info.name = line.substr(6);
+                        info.name.erase(0, info.name.find_first_not_of(" \t"));
                     }
                     if (line.rfind("Uid:", 0) == 0) {
                         std::istringstream iss(line.substr(5));
                         int uid;
                         iss >> uid;
                         struct passwd *pw = getpwuid(uid);
-                        if (pw) info->user = pw->pw_name;
+                        if (pw) info.user = pw->pw_name;
                     }
                     if (line.rfind("VmRSS:", 0) == 0) {
                         std::istringstream iss(line.substr(6));
-                        iss >> info->memory;
+                        iss >> info.memory;
                     }
                     if (line.rfind("State:", 0) == 0) {
-                        info->state = line.substr(7);
-                        info->state.erase(0, info->state.find_first_not_of(" \t"));
+                        info.state = line.substr(7);
+                        info.state.erase(0, info.state.find_first_not_of(" \t"));
                     }
                     if (line.rfind("voluntary_ctxt_switches:", 0) == 0) {
                         std::istringstream iss(line.substr(24));
-                        iss >> info->swichContextVoluntary;
+                        iss >> info.swichContextVoluntary;
                     }
                     if (line.rfind("nonvoluntary_ctxt_switches:", 0) == 0) {
                         std::istringstream iss(line.substr(26));
-                        iss >> info->swichContextInvoluntary;
+                        iss >> info.swichContextInvoluntary;
                     }
                     if (line.rfind("VmData:", 0) == 0) {
                         std::istringstream iss(line.substr(7));
-                        iss >> info->heapSize;
+                        iss >> info.heapSize;
                     }
                     if (line.rfind("VmStk:", 0) == 0) {
                         std::istringstream iss(line.substr(7));
-                        iss >> info->stackSize;
+                        iss >> info.stackSize;
                     }
                 }
 
@@ -126,16 +118,16 @@ void SystemCallProcesses::updateProcesses() {
                 try {
                     for (const auto& threadEntry : fs::directory_iterator(taskPath)) {
                         std::string tid = threadEntry.path().filename().string();
-                        info->threadsID.push_back(tid);
-                        TreadsInfo threadInfo = getThreadInfo(info->pid ,tid);
-                        info->threads.push_back(threadInfo);
+                        info.threadsID.push_back(tid);
+                        TreadsInfo threadInfo = getThreadInfo(info.pid ,tid);
+                        info.threads.push_back(threadInfo);
                     }
-                    info->n_threads = static_cast<uint16_t>(info->threadsID.size());
+                    info.n_threads = static_cast<uint16_t>(info.threadsID.size());
                 } catch (const std::filesystem::filesystem_error& e) {
                     // O processo pode ter terminado, ignore o erro
                 }
 
-                this->info.push_back(info);
+                this->info.push_back(std::move(infoPtr));
             }
         }
     }

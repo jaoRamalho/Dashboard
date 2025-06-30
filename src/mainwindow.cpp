@@ -104,10 +104,10 @@ void MainWindow::onClikedButtonB() {
     // Solicita atualização das partições ao clicar no Botão B, se estiver na aba Files
     if (ui->FilesButton->isChecked()) {
         SystemCallDisk::getInstance()->updateDiskPartitions();
-        const std::vector<InfoBase*>& diskData = SystemCallDisk::getInstance()->getInfo();
+        const auto& diskData = SystemCallDisk::getInstance()->getInfo();
         std::vector<PartitionInfo> partitions;
-        for (InfoBase* base : diskData) {
-            if (PartitionInfo* p = dynamic_cast<PartitionInfo*>(base)) {
+        for (const auto& base : diskData) {
+            if (PartitionInfo* p = dynamic_cast<PartitionInfo*>(base.get())) {
                 partitions.push_back(*p);
             }
         }
@@ -148,7 +148,7 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::onProcessTableRowClicked(int row) {
-    std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
+    //std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
     if (row < 0 || row >= ui->processTable->rowCount() || !update || activeButton != FlagButton::ButtonProcess) {
         return; // Verifica se a linha é válida
     }
@@ -158,12 +158,10 @@ void MainWindow::onProcessTableRowClicked(int row) {
         QString pid = item->text();
 
         // Obtém o vetor de ProcessInfo por valor
-        std::vector<InfoBase*> baseCopy = SystemCallProcesses::getInstance()->getInfo();
-        
-        // Obtém o vetor de InfoBase* e converte para ProcessInfo*
+        const auto& baseCopy = SystemCallProcesses::getInstance()->getInfo();
         std::vector<ProcessInfo> copy;
-        for (InfoBase* base : baseCopy) {
-            if (ProcessInfo* process = dynamic_cast<ProcessInfo*>(base)) {
+        for (const auto& base : baseCopy) {
+            if (ProcessInfo* process = dynamic_cast<ProcessInfo*>(base.get())) {
                 copy.push_back(*process); // Adiciona ao vetor apenas se for ProcessInfo*
             }
         }
@@ -174,8 +172,7 @@ void MainWindow::onProcessTableRowClicked(int row) {
                     // Limpa a tabela de detalhes
                     if (process.threads.empty()) {
                         std::cout << "Nenhuma thread encontrada para o processo com PID: " << process.pid << std::endl;
-                        return; // Se não houver threads, não faz nada
-                    }
+                        return;                    }
                     QStringList headers = {"TID", "Nome", "User", "Memory (KB)", "Switch Context Involuntary", "Switch Context Voluntary", "State"};
                     clearTableWidget(ui->ProcessDataViewA); // Limpa a tabela antes de preencher
                     ui->ProcessDataViewA->clearContents();
@@ -228,12 +225,11 @@ void MainWindow::onProcessTableRowClicked(int row) {
 
                     break; // Encerra o loop após encontrar o processo
                 } else if (activeButtonChar == FlagButton::ButtonC) {
-                    std::cout << "Exibindo informações dos recursos do processo com PID: " << process.pid << std::endl;
                     // Exibir informações dos recursos do processo
                     const Recursos recursos = process.recursos;
                     int nFiles = recursos.arquivos.size();
                     int nSockets = recursos.sockets.size();
-                    int totalRows = nFiles + nSockets;
+                    int totalRows = nFiles + nSockets + 1;
                     QStringList headers = {"Tipo", "Caminho/Endereço Local", "Endereço Remoto", "Estado", "ID Lock Kernel", "Tipo Lock", "Faixa inicio", "Faixa Fim", "Acesso", "Modo"};
                     clearTableWidget(ui->ProcessDataViewA); // Limpa a tabela antes de preencher
                     ui->ProcessDataViewA->clearContents();
@@ -246,14 +242,9 @@ void MainWindow::onProcessTableRowClicked(int row) {
                     for (const ArquivoAberto& arq : recursos.arquivos) {
                         ui->ProcessDataViewA->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(arq.tipo)));
                         ui->ProcessDataViewA->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(arq.caminho)));
-                        ui->ProcessDataViewA->setItem(row, 2, new QTableWidgetItem("-"));
-                        ui->ProcessDataViewA->setItem(row, 3, new QTableWidgetItem("-"));
-                        ui->ProcessDataViewA->setItem(row, 4, new QTableWidgetItem(QString::number(process.fileLock.id)));
-                        ui->ProcessDataViewA->setItem(row, 5, new QTableWidgetItem(QString::fromStdString(process.fileLock.tipo)));
-                        ui->ProcessDataViewA->setItem(row, 6, new QTableWidgetItem(QString::fromStdString(process.fileLock.faixaInicio)));
-                        ui->ProcessDataViewA->setItem(row, 7, new QTableWidgetItem(QString::fromStdString(process.fileLock.faixaFim)));
-                        ui->ProcessDataViewA->setItem(row, 8, new QTableWidgetItem(QString::fromStdString(process.fileLock.acesso)));
-                        ui->ProcessDataViewA->setItem(row, 9, new QTableWidgetItem(QString::fromStdString(process.fileLock.modo))); 
+                        for (size_t i = 2; i < 10; i++){
+                            ui->ProcessDataViewA->setItem(row, i, new QTableWidgetItem("-")); // Preenche com "-" para evitar ponteiros nulos
+                        }  
                         ++row;
                     }
                     // Sockets
@@ -262,7 +253,24 @@ void MainWindow::onProcessTableRowClicked(int row) {
                         ui->ProcessDataViewA->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(sock.localAddress)));
                         ui->ProcessDataViewA->setItem(row, 2, new QTableWidgetItem(QString::fromStdString(sock.remoteAddress)));
                         ui->ProcessDataViewA->setItem(row, 3, new QTableWidgetItem(QString::fromStdString(sock.state)));
+                        // Fill remaining columns with "-" to avoid null pointers
+                        for (int col = 4; col < 10; ++col) {
+                            ui->ProcessDataViewA->setItem(row, col, new QTableWidgetItem("-"));
+                        }
                         ++row;
+                    }
+
+                    // Locks de arquivos
+                    ui->ProcessDataViewA->setItem(row, 4, new QTableWidgetItem(QString::number(process.fileLock.id)));
+                    ui->ProcessDataViewA->setItem(row, 5, new QTableWidgetItem(QString::fromStdString(process.fileLock.tipo)));
+                    ui->ProcessDataViewA->setItem(row, 6, new QTableWidgetItem(QString::fromStdString(process.fileLock.faixaInicio)));
+                    ui->ProcessDataViewA->setItem(row, 7, new QTableWidgetItem(QString::fromStdString(process.fileLock.faixaFim)));
+                    ui->ProcessDataViewA->setItem(row, 8, new QTableWidgetItem(QString::fromStdString(process.fileLock.acesso)));
+                    ui->ProcessDataViewA->setItem(row, 9, new QTableWidgetItem(QString::fromStdString(process.fileLock.modo)));
+                    for (int col = 0; col < 4; ++col) {
+                        if (col < 4) {
+                            ui->ProcessDataViewA->setItem(row, col, new QTableWidgetItem("-")); // Preenche com "-" para evitar ponteiros nulos
+                        }
                     }
                 }
             }
@@ -271,11 +279,9 @@ void MainWindow::onProcessTableRowClicked(int row) {
 }
 
 void MainWindow::onClickedButtonProcess() {
-    //std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
     setActiveButton(ui->ProcessButton);
     ui->ProcessDataViewA->clear();
-    activeButton = FlagButton::ButtonProcess; // Define o botão ativo como Process
-    desativeButtons();
+    activeButton = FlagButton::ButtonProcess;    desativeButtons();
     ui->ProcessButton->setChecked(true);
     ui->stackedWidgetMain->setCurrentIndex(0);
     fileTreeView->hide();
@@ -296,10 +302,10 @@ void MainWindow::onClickedButtonProcess() {
     ui->infor15->setText("Op. Sistems");
 
     SystemCallProcesses::getInstance()->updateProcesses();
-    const std::vector<InfoBase*>& raw = SystemCallProcesses::getInstance()->getInfo();
+    const auto& raw = SystemCallProcesses::getInstance()->getInfo();
     std::vector<ProcessInfo> processes;
-    for (InfoBase* base : raw) {
-        if (ProcessInfo* process = dynamic_cast<ProcessInfo*>(base)) {
+    for (const auto& base : raw) {
+        if (ProcessInfo* process = dynamic_cast<ProcessInfo*>(base.get())) {
             processes.push_back(*process);
         }
     }
@@ -309,18 +315,17 @@ void MainWindow::onClickedButtonProcess() {
 void MainWindow::onClickedButtonMemory() {
     setActiveButton(ui->MemoryButton);
     clearAllTexts();
-    activeButton = FlagButton::ButtonMemory; // Define o botão ativo como Memory
-    ui->ProcessDataViewA->clear();
+    activeButton = FlagButton::ButtonMemory;    ui->ProcessDataViewA->clear();
     desativeButtons();
     ui->MemoryButton->setChecked(true);
     ui->stackedWidgetMain->setCurrentIndex(0);
     fileTreeView->hide();
 
     SystemCallMemory::getInstance()->updateMemory();
-    const std::vector<InfoBase*>& raw = SystemCallMemory::getInstance()->getInfo();
+    const auto& raw = SystemCallMemory::getInstance()->getInfo();
     std::vector<MemoryInfo> memoryList;
-    for (InfoBase* base : raw) {
-        if (MemoryInfo* memory = dynamic_cast<MemoryInfo*>(base)) {
+    for (const auto& base : raw) {
+        if (MemoryInfo* memory = dynamic_cast<MemoryInfo*>(base.get())) {
             memoryList.push_back(*memory); 
         }
     }
@@ -485,10 +490,10 @@ void MainWindow::onClickedButtonPartitions() {
     fileTreeView->hide();
     ui->titleA->setText("Partitions Information");
     SystemCallDisk::getInstance()->updateDiskPartitions();
-    const std::vector<InfoBase*>& raw = SystemCallDisk::getInstance()->getInfo();
+    const auto& raw = SystemCallDisk::getInstance()->getInfo();
     std::vector<PartitionInfo> partitions;
-    for (InfoBase* base : raw) {
-        if (PartitionInfo* part = dynamic_cast<PartitionInfo*>(base)) {
+    for (const auto& base : raw) {
+        if (PartitionInfo* part = dynamic_cast<PartitionInfo*>(base.get())) {
             partitions.push_back(*part);
         }
     }

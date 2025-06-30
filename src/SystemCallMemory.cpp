@@ -12,8 +12,7 @@ SystemCallMemory::SystemCallMemory(QObject* parent) : SystemCall(parent) {
 SystemCallMemory::~SystemCallMemory() {
     std::cout << "SystemCallMemory destructor called" << std::endl;
     isRunning = false; // Ensure the loops stop
-    for (auto& inst : info) delete inst;
-    info.clear();
+    info.clear(); // unique_ptr limpa automaticamente
     instance = nullptr; // Clear the singleton instance
 }
 
@@ -26,11 +25,8 @@ SystemCallMemory* SystemCallMemory::getInstance(QObject* parent) {
 
 void SystemCallMemory::updateMemory() {
     //std::lock_guard<std::mutex> lock(globalMutex);
-    for (auto& inst : info) {
-        delete inst; // Limpa a memória dos objetos anteriores
-    }
-    this->info.clear();
-    MemoryInfo* memInfo = new MemoryInfo();
+    info.clear();
+    auto memInfo = std::make_unique<MemoryInfo>();
 
     std::ifstream memFile("/proc/meminfo");
     if (memFile.is_open()) {
@@ -51,7 +47,7 @@ void SystemCallMemory::updateMemory() {
             }
         }
         memInfo->used = memInfo->total - memInfo->free - memInfo->buffers - memInfo->cached;
-        this->info.push_back(memInfo);
+        info.push_back(std::move(memInfo));
     }
 }
 

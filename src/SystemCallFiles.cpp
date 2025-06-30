@@ -17,10 +17,7 @@ SystemCallFiles::~SystemCallFiles() {
     std::cout << "SystemCallFiles destructor called" << std::endl;
     isRunning = false;
     instance = nullptr;
-    for (auto& ptr : info) {
-        delete ptr; // Limpa a memória dos objetos anteriores
-    }
-    
+    info.clear(); // unique_ptr limpa automaticamente
 }
 
 SystemCallFiles* SystemCallFiles::getInstance(QObject* parent) {
@@ -78,14 +75,11 @@ FileSystemNode scanDirectory(const std::filesystem::path& path) {
 void SystemCallFiles::updateFileSystemTree(const std::string& rootPath) {
     //std::lock_guard<std::mutex> lock(globalMutex);
 
-    for (auto& ptr : info) {
-        delete ptr;
-    }
     info.clear();
 
     try {
-        FileSystemNode* root = new FileSystemNode(scanDirectory(rootPath));
-        info.push_back(root);
+        auto root = std::make_unique<FileSystemNode>(scanDirectory(rootPath));
+        info.push_back(std::move(root));
     } catch (const std::exception& e) {
         std::cerr << "Erro ao escanear diretório: " << e.what() << std::endl;
     }
