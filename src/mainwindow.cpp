@@ -130,7 +130,7 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::onProcessTableRowClicked(int row) {
-    std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
+    //std::lock_guard<std::mutex> lock(globalMutex); // Protege o acesso à lista de processos
     if (row < 0 || row >= ui->processTable->rowCount() || !update) {
         return; // Verifica se a linha é válida
     }
